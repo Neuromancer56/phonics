@@ -1,7 +1,6 @@
---
+
 --Phonics by bacon and Neuromancer
 --License code and textures WTFPL 
---code borrows heavilly from InfinityProject's firework mod.
 --Requirements:
 --Mouth block right click says the word it wants you to spell
 --mouth block left click (punch) sounds out what you have spelled (to the right of it)
@@ -15,31 +14,6 @@
 --someday have an NPC Tutor.
 --maybe have it spell out the correct answer if you put a show answer block on top of it.
 --if you don't want a word and want a new word, just destroy the mouth block.
-
-minetest.register_abm({
-		nodenames = {"phonics:a", "phonics:c", "phonics:a_active", "phonics:c_active"},
-		interval = 8,
-		chance = 1,	
-		
-		action = function(pos, node, active_object_count, active_object_count_wider)
---		if node.name == "fireworks:red" then
---				  minetest.env:remove_node(pos,{name="fireworks:red"})
---		elseif node.name == "fireworks:blue" then
---		          minetest.env:remove_node(pos,{name="fireworks:blue"})
---		elseif node.name == "fireworks:green" then
---				  minetest.env:remove_node(pos,{name="fireworks:green"})
---		elseif node.name == "fireworks:purple" then
---		          minetest.env:remove_node(pos,{name="fireworks:purple"})
---		elseif node.name == "fireworks:orange" then
---				  minetest.env:remove_node(pos,{name="fireworks:orange"})
---		elseif node.name == "fireworks:yellow" then
---		          minetest.env:remove_node(pos,{name="fireworks:yellow"})
---		elseif node.name == "fireworks:rainbow" then
---		          minetest.env:remove_node(pos,{name="fireworks:rainbow"})
---				  
---			end
-		end
-})
 
 minetest.register_node("phonics:SayWord", {
 	description = "say word",
@@ -56,156 +30,80 @@ minetest.register_node("phonics:SayWord", {
 	groups = {cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
---minetest.register_node("fireworks:red", {
---	drawtype = "plantlike",
---	description = "Red",
---	tiles = {"fireworks_red.png"},
---	light_source = 14,  --**********
---	walkable = false,
---	is_ground_content = true,
---	pointable = false,
---	groups = {cracky=3,not_in_creative_inventory=1},
---	sounds = default.node_sound_stone_defaults(),
---})
-
 
 minetest.register_node("phonics:a", {
 	description = "a",
 	tiles = {"a.jpg"},
 	is_ground_content = true,
 	groups = {cracky=3},
-	sounds = {
-        footstep = default.node_sound_stone_defaults(),
-        --dig = {name="a", gain= 1}, -- "__group" = group-based sound (default)
-        --dug = default.node_sound_stone_defaults(),
-        },
+	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("phonics:c", {
 	description = "c",
 	tiles = {"c.jpg"},
-		light_source = 14,  --**********
 	is_ground_content = true,
 	groups = {cracky=3},
-		sounds = {
-        footstep = default.node_sound_stone_defaults(),
-        --dig = {name="c", gain= 1}, -- "__group" = group-based sound (default)
-       -- place = {name="c", gain= 1},
-        dug = default.node_sound_stone_defaults(),
-    },
+	sounds = default.node_sound_stone_defaults(),
 })
 
 minetest.register_node("phonics:c_active", {
 	description = "c_active",
-	tiles = {"white.jpg"},
+	tiles = {"c_active.png"},
+	light_source = 44, 
 	is_ground_content = true,
 	groups = {cracky=3},
-	sounds = {
-        footstep = default.node_sound_stone_defaults(),
-        dig = {name="c", gain= 1}, -- "__group" = group-based sound (default)
-        dug = default.node_sound_stone_defaults(),
-        place = {name="c", gain= 1},
-        },
+	sounds = default.node_sound_stone_defaults(),
 })
 minetest.register_node("phonics:a_active", {
 	description = "a_active",
-	tiles = {"white.jpg"},
+	tiles = {"a_active.png"},
+	light_source = 44,
 	is_ground_content = true,
 	groups = {cracky=3},
-	sounds = {
-        footstep = default.node_sound_stone_defaults(),
-      --  dig = {name="a", gain= 1}, -- "__group" = group-based sound (default)
---        dug = default.node_sound_stone_defaults(),
-        },
+	sounds = default.node_sound_stone_defaults(),
 })
-
---minetest.register_node("fireworks:red", {
---	drawtype = "plantlike",
---	description = "Red",
---	tiles = {"fireworks_red.png"},
---	light_source = 14,
---	walkable = false,
---	is_ground_content = true,
---	pointable = false,
---	groups = {cracky=3,not_in_creative_inventory=1},
---	sounds = default.node_sound_stone_defaults(),
---})
-
-local clock = os.clock
-function sleep(n)  -- seconds
-   local t0 = clock()
-   while clock() - t0 <= n do
-   end
-end
 
 local phonics = {
 	handler = {},
 	{name="a", length=1.3, gain=1},
 	{name="c", length=.3, gain=1}	
 }
-local play_sound = function(list, number)
+
+local play_sound = function(list, soundname)
 		local gain = 1.0
-		minetest.chat_send_all("number" .. number ..">" )
+		minetest.chat_send_all("number" .. soundname ..">" )
 		--minetest.chat_send_all("list[1].name" .. list[1].name ..">" )
-		minetest.chat_send_all("list[number].name" .. list[number].name ..">" )
-		local handler = minetest.sound_play(list[number].name, {gain=gain})
-		--local handler = minetest.sound_play(number, {gain=gain})
+		--minetest.chat_send_all("list[number].name" .. list[number].name ..">" )
+		local handler = minetest.sound_play(soundname, {gain=gain})
 end
 
-function phonics_activate (pos, node)
---	minetest.chat_send_all("pos.x" .. pos.x ..">" )
---	minetest.chat_send_all("pos.y" .. pos.y ..">" )
---	minetest.chat_send_all("pos.z" .. pos.z ..">" )
-play_sound(phonics, node)
+function revertnode(parms)  
+ 	posx = parms[1]
+ 	nodex= parms[2]
+ 	minetest.chat_send_all("nodex: " .. nodex ..">" )
+ 	
+ 	minetest.env:remove_node(posx,{name="phonics:"..nodex.."_active"})
+ 	minetest.env:place_node(posx,{name="phonics:"..nodex})
 end
 
---if 
---  node.name == "phonics:a" 
---then
---end
---elseif
---  node.name == "phonics:c" 
---then
---end
---
---end --function
-
---minetest.env:remove_node(pos,{name="fireworks:firework_green"})
-function revertnode(pos)  
- 	minetest.env:remove_node(pos,{name="phonics:a_active"})
- 	minetest.env:place_node(pos,{name="phonics:a"})
+function activate_node(pos, nodename, duration)
+ 	minetest.env:remove_node(pos,{name="phonics:"..nodename})
+ 	minetest.env:place_node(pos,{name="phonics:"..nodename.."_active"}) 
+ 	play_sound(phonics, nodename) 
+ 	minetest.after(duration, revertnode, {pos, nodename})	
 end
-
 
 minetest.register_on_punchnode( function(pos, node, puncher)
-
---minetest.chat_send_all("number" .. descr ..">" )
---if node.name == "phonics:a" 
--- then phonics_activate(pos, node.description) --1
---end
 if node.name == "phonics:c" 
  then 
- 	minetest.env:remove_node(pos,{name="phonics:c"})
- 	minetest.env:place_node(pos,{name="phonics:c_active"})
- 	phonics_activate(pos, 2) --2\
- 	minetest.env:dig_node(pos,{name="phonics:c_active"})
- 	minetest.env:place_node(pos,{name="phonics:c"})
+	activate_node(pos, "c", .3)
 end
 if node.name == "phonics:a" 
  then 
- 
- 
- 	minetest.env:remove_node(pos,{name="phonics:a"})
- 	minetest.env:place_node(pos,{name="phonics:a_active"}) 	
- phonics_activate(pos, 1) --2\	
- 	--sleep(1)
- 	minetest.after(1.0, revertnode, pos)
- --	minetest.env:remove_node(pos,{name="phonics:a_active"})
--- 	minetest.env:place_node(pos,{name="phonics:a"})
- 	
+ 	activate_node(pos, "a", 1.1)
 end
 
---phonics_activate(pos, node.description)
 if node.name == "phonics:SayWord" 
  then 
  	pos.z = pos.z-2
@@ -214,12 +112,9 @@ if node.name == "phonics:SayWord"
  	--minetest.env:dig_node(pos) 
  	--http://minetest.net/forum/viewtopic.php?id=2602
  	--https://c9.io/lkjoel/minetest-modder/workspace/parseme.txt
-end
-
-
-end
+	end
+end --register_on_Punchnode
  
  )
-
 
 print("Phonics Mod Loaded!")
