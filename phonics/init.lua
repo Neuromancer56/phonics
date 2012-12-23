@@ -111,7 +111,10 @@ function revertnode(parms)
  	minetest.env:place_node(pos3,{name="phonics:"..node3})
 end
 
-function activate_node(pos2, nodename, duration)
+function activate_node(anparms)
+	local pos2 = anparms[1]
+	local nodename = anparms[2]
+	local duration = anparms[3]
  	minetest.env:remove_node(pos2,{name="phonics:"..nodename})
  	minetest.env:place_node(pos2,{name="phonics:"..nodename.."_active"}) 
  	play_sound(phonics, nodename) 
@@ -119,10 +122,13 @@ function activate_node(pos2, nodename, duration)
               np.x = pos2.x 
               np.y = pos2.y 
               np.z = pos2.z 
- 	minetest.after(duration, revertnode, {np, nodename})	
+ 	minetest.after(duration, revertnode, {np, nodename})		
 end
 
+
+
 function sound_out_word(pos1, axis, direction)
+	local delay = 0
 	repeat
 		if axis == "x" then
 			pos1.x=pos1.x+direction
@@ -135,29 +141,35 @@ function sound_out_word(pos1, axis, direction)
 		local nodename_prefix = nodenamearray[1]
 		local nodename_suffix = nodenamearray[2]	
 		if  nodename_prefix =="phonics" then		
-			local duration = .5		
-			activate_node(pos1, nodename_suffix, duration)
+			local duration = 1			
+			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+              lpos.x = pos1.x 
+              lpos.y = pos1.y 
+              lpos.z = pos1.z 	
+			--activate_node({pos1, nodename_suffix, duration})
+			minetest.after(delay, activate_node, {lpos, nodename_suffix, duration})
+			delay = delay +1 
 --may need to pause here between each activation as well						
 		end
 	until nodename_prefix ~="phonics"	
 end
 
 minetest.register_on_punchnode( function(pos, node, puncher)
-
+--activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
 	hit_with = puncher:get_wielded_item()
 	wear=hit_with:get_wear()
 	--print (temp["wear"])
 
 if node.name == "phonics:c" 
  then 
- 	if wear == 0 then
-		activate_node(pos, "c", .4)
+ 	if wear == 0 then  
+		activate_node({pos, "c", .4})
 	end
 end
 if node.name == "phonics:a" 
  then 
  	if wear == 0 then
-		activate_node(pos, "a", 1.1)
+		activate_node({pos, "a", 1.1})
 	end
 end
 if node.name == "phonics:SayWord" 
