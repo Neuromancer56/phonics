@@ -3,15 +3,21 @@
 --License code and textures WTFPL 
 --Requirements (being worked on):
 
---This mod has a long way to go.  For now you can left click the blue blocks and they make phonics sounds and light up.  Here's the plan:
---fix sound out word.
---use phonics table and a loop to register all the nodes
+--This mod has a long way to go.  
+--For now you can left click the blue blocks and they make phonics sounds and light up.  
 
---mouth block left click (punch) says the word it wants you to spell followed by sounding out what you have spelled (to the right of it)
+
+--Start by placing the blue phonics blocks and left clicking on them to hear their sounds.  They also light up.
+--Next place a "sound out word" block (the one with a mouth on it) and then build a word by placing the blue blocks next to it.
+--Left Click (punch) the blue block to hear the word you built sounded out.
+
+--Here's the plan for enhancements:
+
+--Left Clicking (punching) on the mouth block left click says a word it wants you to spell 
+--followed by sounding out what you have spelled to the right of it.
 --if what you have spelled matches one of the spellings for the mouth the block is looking for it makes a
----  firework sound (eventually launching blocks into the air as fireworks)
+---firework sound (eventually launching blocks into the air as fireworks)
 --if you have not spelled the word the mouth block is looking for, it makes a sad noise.
---(done)as it says each sound the corresponding block lights up
 --if you destroy mouth block, it destroys all letters to the right of it  (explode or fire burn)
 --gray blocks are silent letters which are not sounded out 
 -- this means we have to create sounds for words and an array of spellings for each word.
@@ -23,10 +29,14 @@
 --Create blocks with pictures of the thing that the word describes so that someone learning the language as a second language could also benefit.
 --someday have an NPC Tutor.
 
+--TODO:
+----use phonics table and a loop to register all the nodes
+
+
 local phonics = {
-	handler = {},
-	{name="a", length=1.3, gain=1},
-	{name="c", length=.3, gain=1}	
+	--handler = {},
+	a={name="a", length=1.2, gain=1},
+	c={name="c", length=.3, gain=1}	
 }
 
 minetest.register_node("phonics:SayWord", {
@@ -125,31 +135,34 @@ function activate_node(anparms)
  	minetest.after(duration, revertnode, {np, nodename})		
 end
 
-
-
 function sound_out_word(pos1, axis, direction)
-	local delay = 0
+	local cumulative_delay = 0
+	local mpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+      mpos.x = pos1.x 
+      mpos.y = pos1.y 
+      mpos.z = pos1.z 
 	repeat
 		if axis == "x" then
-			pos1.x=pos1.x+direction
+			mpos.x=mpos.x+direction
 		end	
 		if axis == "z" then
-				pos1.z=pos1.z+direction
+				mpos.z=mpos.z+direction
 		end	
-		local nodename = minetest.env:get_node(pos1).name 
+		local nodename = minetest.env:get_node(mpos).name 
 		local nodenamearray = split(nodename, ":")
 		local nodename_prefix = nodenamearray[1]
-		local nodename_suffix = nodenamearray[2]	
-		if  nodename_prefix =="phonics" then		
+		local nodename_suffix = nodenamearray[2]
+		minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
+		minetest.chat_send_all("axis:" .. axis ..">" )
+		local delay = phonics[nodename_suffix]
+		if  delay ~=nil and nodename_prefix =="phonics"  then 		
 			local duration = 1			
 			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
-              lpos.x = pos1.x 
-              lpos.y = pos1.y 
-              lpos.z = pos1.z 	
-			--activate_node({pos1, nodename_suffix, duration})
-			minetest.after(delay, activate_node, {lpos, nodename_suffix, duration})
-			delay = delay +1 
---may need to pause here between each activation as well						
+              lpos.x = mpos.x 
+              lpos.y = mpos.y 
+              lpos.z = mpos.z 	
+			minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, duration})
+			cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
 		end
 	until nodename_prefix ~="phonics"	
 end
@@ -158,8 +171,6 @@ minetest.register_on_punchnode( function(pos, node, puncher)
 --activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
 	hit_with = puncher:get_wielded_item()
 	wear=hit_with:get_wear()
-	--print (temp["wear"])
-
 if node.name == "phonics:c" 
  then 
  	if wear == 0 then  
@@ -174,9 +185,9 @@ if node.name == "phonics:a"
 end
 if node.name == "phonics:SayWord" 
  then 
-    --sound_out_word(pos, "x", 1)
-    --sound_out_word(pos, "x", -1)
-    --sound_out_word(pos, "z", 1)
+    sound_out_word(pos, "x", 1)
+    sound_out_word(pos, "x", -1)
+    sound_out_word(pos, "z", 1)
     sound_out_word(pos, "z", -1)
 end
 end 
@@ -187,3 +198,4 @@ print("Phonics Mod Loaded!")
  	--minetest.env:dig_node(pos) 
  	--http://minetest.net/forum/viewtopic.php?id=2602
  	--https://c9.io/lkjoel/minetest-modder/workspace/parseme.txt
+--print (temp["wear"])
