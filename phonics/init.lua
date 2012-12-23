@@ -5,7 +5,6 @@
 
 --This mod has a long way to go.  For now you can left click the blue blocks and they make phonics sounds and light up.  Here's the plan:
 --fix sound out word.
---fix you can no longer dig a phonics node because it is changing state while you are digging it.  (if using pickaxe like super pickaxe then just delete it)
 --use phonics table and a loop to register all the nodes
 
 --mouth block left click (punch) says the word it wants you to spell followed by sounding out what you have spelled (to the right of it)
@@ -75,7 +74,7 @@ minetest.register_node("phonics:a_active", {
 	tiles = {"a_active.png"},
 	light_source = 20,
 	is_ground_content = true,
-	groups = {cracky=3, choppy=3, oddly_breakable_by_hand=3},
+	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -106,70 +105,69 @@ local play_sound = function(list, soundname)
 end
 
 function revertnode(parms)  
- 	posx = parms[1]
- 	nodex= parms[2]
- --	minetest.chat_send_all("nodex: " .. nodex ..">" )
- 	
- 	minetest.env:remove_node(posx,{name="phonics:"..nodex.."_active"})
- 	minetest.env:place_node(posx,{name="phonics:"..nodex})
+ 	local pos3 = parms[1]
+ 	local node3= parms[2]
+ 	minetest.env:remove_node(pos3,{name="phonics:"..node3.."_active"})
+ 	minetest.env:place_node(pos3,{name="phonics:"..node3})
 end
 
-function activate_node(pos, nodename, duration)
-	minetest.chat_send_all("activatePosz: " .. pos.z ..">" )
-	minetest.chat_send_all("activateNodename: " .. nodename ..">" )
-	minetest.chat_send_all("activateDuration: " .. duration ..">" )
- 	minetest.env:remove_node(pos,{name="phonics:"..nodename})
- 	minetest.env:place_node(pos,{name="phonics:"..nodename.."_active"}) 
+function activate_node(pos2, nodename, duration)
+ 	minetest.env:remove_node(pos2,{name="phonics:"..nodename})
+ 	minetest.env:place_node(pos2,{name="phonics:"..nodename.."_active"}) 
  	play_sound(phonics, nodename) 
- 	minetest.after(duration, revertnode, {pos, nodename})	
+ 	local np = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+              np.x = pos2.x 
+              np.y = pos2.y 
+              np.z = pos2.z 
+ 	minetest.after(duration, revertnode, {np, nodename})	
 end
 
-function sound_out_word(pos, axis, direction)
-	minetest.chat_send_all("soundoutword" )
+function sound_out_word(pos1, axis, direction)
 	repeat
-		minetest.chat_send_all("B4 pos.x: " .. pos.x ..">" )
-		minetest.chat_send_all("B4 pos.z: " .. pos.z ..">" )
 		if axis == "x" then
-				pos.x=pos.x+direction
-				minetest.chat_send_all("xDirection: " .. direction ..">" )
+			pos1.x=pos1.x+direction
 		end	
 		if axis == "z" then
-				pos.z=pos.z+direction
-				minetest.chat_send_all("zDirection: " .. direction ..">" )
+				pos1.z=pos1.z+direction
 		end	
-		minetest.chat_send_all("pos.x: " .. pos.x ..">" )
-		minetest.chat_send_all("pos.z: " .. pos.z ..">" )
-		nodename = minetest.env:get_node(pos).name 
-		nodenamearray = split(nodename, ":")
-		nodename_prefix = nodenamearray[1]
-		nodename_suffix = nodenamearray[2]	
+		local nodename = minetest.env:get_node(pos1).name 
+		local nodenamearray = split(nodename, ":")
+		local nodename_prefix = nodenamearray[1]
+		local nodename_suffix = nodenamearray[2]	
 		if  nodename_prefix =="phonics" then		
-			duration = .5
-			activate_node(pos, nodename_suffix, duration)
+			local duration = .5		
+			activate_node(pos1, nodename_suffix, duration)
 --may need to pause here between each activation as well						
 		end
 	until nodename_prefix ~="phonics"	
 end
 
 minetest.register_on_punchnode( function(pos, node, puncher)
+
+	hit_with = puncher:get_wielded_item()
+	wear=hit_with:get_wear()
+	--print (temp["wear"])
+
 if node.name == "phonics:c" 
  then 
-	activate_node(pos, "c", .4)
+ 	if wear == 0 then
+		activate_node(pos, "c", .4)
+	end
 end
 if node.name == "phonics:a" 
  then 
- 	activate_node(pos, "a", 1.1)
+ 	if wear == 0 then
+		activate_node(pos, "a", 1.1)
+	end
 end
 if node.name == "phonics:SayWord" 
  then 
- 	minetest.chat_send_all("SayWordPunched " )
---    sound_out_word(pos, "x", 1)
---    sound_out_word(pos, "x", -1)
---    sound_out_word(pos, "z", 1)
+    --sound_out_word(pos, "x", 1)
+    --sound_out_word(pos, "x", -1)
+    --sound_out_word(pos, "z", 1)
     sound_out_word(pos, "z", -1)
-	end
-end --what is this end for (register on punchnode?   Isn't that what the ) is for?
-
+end
+end 
  )
 
 print("Phonics Mod Loaded!")
