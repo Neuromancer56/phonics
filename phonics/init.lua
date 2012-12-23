@@ -3,10 +3,10 @@
 --License code and textures WTFPL 
 --Requirements (being worked on):
 
---use chat to find out what is happening with sound out word.
+--This mod has a long way to go.  For now you can left click the blue blocks and they make phonics sounds and light up.  Here's the plan:
+--fix sound out word.
 --fix you can no longer dig a phonics node because it is changing state while you are digging it.  (if using pickaxe like super pickaxe then just delete it)
 --use phonics table and a loop to register all the nodes
-
 
 --mouth block left click (punch) says the word it wants you to spell followed by sounding out what you have spelled (to the right of it)
 --if what you have spelled matches one of the spellings for the mouth the block is looking for it makes a
@@ -18,11 +18,10 @@
 -- this means we have to create sounds for words and an array of spellings for each word.
 --if you don't want a word and want a new word, just destroy the mouth block.
 --maybe have it spell out the correct answer if you put a show answer block on top of the mouth block.
-
 --if you place a word block, a word is automatically generated to the right of the word block and you are expected to read it.
 --you can click individual blocks to help you sound it out
 --you can also left click the word block to get the answer (it will sound out the word and then say the word.)
-
+--Create blocks with pictures of the thing that the word describes so that someone learning the language as a second language could also benefit.
 --someday have an NPC Tutor.
 
 local phonics = {
@@ -51,7 +50,7 @@ minetest.register_node("phonics:a", {
 	description = "a",
 	tiles = {"a.jpg"},
 	is_ground_content = true,
-	groups = {cracky=3},
+	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -59,7 +58,7 @@ minetest.register_node("phonics:c", {
 	description = "c",
 	tiles = {"c.jpg"},
 	is_ground_content = true,
-	groups = {cracky=3},
+	groups = {cracky=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -68,7 +67,7 @@ minetest.register_node("phonics:c_active", {
 	tiles = {"c_active.png"},
 	light_source = 20, 
 	is_ground_content = true,
-	groups = {cracky=3},
+	groups = {cracky=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 minetest.register_node("phonics:a_active", {
@@ -76,7 +75,7 @@ minetest.register_node("phonics:a_active", {
 	tiles = {"a_active.png"},
 	light_source = 20,
 	is_ground_content = true,
-	groups = {cracky=3},
+	groups = {cracky=3, choppy=3, oddly_breakable_by_hand=3},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -116,6 +115,9 @@ function revertnode(parms)
 end
 
 function activate_node(pos, nodename, duration)
+	minetest.chat_send_all("activatePosz: " .. pos.z ..">" )
+	minetest.chat_send_all("activateNodename: " .. nodename ..">" )
+	minetest.chat_send_all("activateDuration: " .. duration ..">" )
  	minetest.env:remove_node(pos,{name="phonics:"..nodename})
  	minetest.env:place_node(pos,{name="phonics:"..nodename.."_active"}) 
  	play_sound(phonics, nodename) 
@@ -142,7 +144,9 @@ function sound_out_word(pos, axis, direction)
 		nodename_prefix = nodenamearray[1]
 		nodename_suffix = nodenamearray[2]	
 		if  nodename_prefix =="phonics" then		
---			activate_node(pos, nodename_suffix, duration)						
+			duration = .5
+			activate_node(pos, nodename_suffix, duration)
+--may need to pause here between each activation as well						
 		end
 	until nodename_prefix ~="phonics"	
 end
