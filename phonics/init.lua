@@ -1,18 +1,15 @@
 
 --Phonics by bacon and Neuromancer
 --License code and textures WTFPL 
---Requirements (being worked on):
-
---This mod has a long way to go.  
+ 
 --For now you can left click the blue blocks and they make phonics sounds and light up.  
-
 
 --Start by placing the blue phonics blocks and left clicking on them to hear their sounds.  They also light up.
 --Next place a "sound out word" block (the one with a mouth on it) and then build a word by placing the blue blocks next to it.
---Left Click (punch) the blue block to hear the word you built sounded out.
+--Left Click (punch) the mouth block to hear the word you built sounded out.
 
---Here's the plan for enhancements:
-
+--This mod has a long way to go: 
+--Plan for enhancements (being worked on):
 --Left Clicking (punching) on the mouth block left click says a word it wants you to spell 
 --followed by sounding out what you have spelled to the right of it.
 --if what you have spelled matches one of the spellings for the mouth the block is looking for it makes a
@@ -45,9 +42,9 @@ minetest.register_node("phonics:SayWord", {
 	"white.jpg",
 	"white.jpg",
 	"white.jpg",
-	"white.jpg",
-	"white.jpg",
-	"mouthspeaking.jpg",},
+	"SpeakingMouth64.png",
+	"SpeakingMouth64.png",
+	"SpeakingMouth64.png",},
 	is_ground_content = true,
 		paramtype = "light",
 	paramtype2 = "facedir",
@@ -198,4 +195,3 @@ print("Phonics Mod Loaded!")
  	--minetest.env:dig_node(pos) 
  	--http://minetest.net/forum/viewtopic.php?id=2602
  	--https://c9.io/lkjoel/minetest-modder/workspace/parseme.txt
---print (temp["wear"])
