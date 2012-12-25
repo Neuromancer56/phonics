@@ -27,10 +27,10 @@
 --someday have an NPC Tutor.
 
 --TODO:
-----use phonics table and a loop to register all the nodes
+--remove activated nodes from creative inventory.
 
 
-local phonics = {
+phonics = {
 	--handler = {},
 	a={name="a", length=1.2, gain=1},
 	c={name="c", length=.3, gain=1},
@@ -43,10 +43,29 @@ local phonics = {
 }
 
 local words = {
-	cat={spellings={"cat"}}
+	cat={spellings={ {c},{a},{t} } }
 }
 
---current_word 
+for key,value in pairs(phonics) do
+	minetest.register_node("phonics:"..key, {
+	description = key,
+	tiles = {key..".jpg"},
+	is_ground_content = true,
+	groups = {cracky=3, choppy=3},
+	sounds = default.node_sound_stone_defaults(),
+	})
+	minetest.register_node("phonics:"..key.."_active", {
+	description = key.."_active",
+	tiles = {key.."_active.png"},
+	light_source = 20,
+	is_ground_content = true,
+	groups = {cracky=3, choppy=3},
+	sounds = default.node_sound_stone_defaults(),
+})
+	
+end
+
+--current_word =
 
 minetest.register_node("phonics:SayWord", {
 	description = "say word",
@@ -61,132 +80,6 @@ minetest.register_node("phonics:SayWord", {
 		paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {cracky=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:a", {
-	description = "a",
-	tiles = {"a.jpg"},
-	is_ground_content = true,
-	groups = {cracky=3, choppy=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:c", {
-	description = "c",
-	tiles = {"c.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:i", {
-	description = "i",
-	tiles = {"i.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:l", {
-	description = "l",
-	tiles = {"l.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:m", {
-	description = "m",
-	tiles = {"m.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:o", {
-	description = "o",
-	tiles = {"o.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:t", {
-	description = "t",
-	tiles = {"t.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:x", {
-	description = "x",
-	tiles = {"x.jpg"},
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:a_active", {
-	description = "a_active",
-	tiles = {"a_active.png"},
-	light_source = 20,
-	is_ground_content = true,
-	groups = {cracky=3, choppy=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:c_active", {
-	description = "c_active",
-	tiles = {"c_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:i_active", {
-	description = "i_active",
-	tiles = {"i_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:l_active", {
-	description = "l_active",
-	tiles = {"l_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:m_active", {
-	description = "m_active",
-	tiles = {"m_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:o_active", {
-	description = "o_active",
-	tiles = {"o_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("phonics:t_active", {
-	description = "t_active",
-	tiles = {"t_active.png"},
-	light_source = 20,
-	is_ground_content = true,
-	groups = {cracky=3, choppy=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-minetest.register_node("phonics:x_active", {
-	description = "x_active",
-	tiles = {"x_active.png"},
-	light_source = 20, 
-	is_ground_content = true,
-	groups = {cracky=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -253,16 +146,15 @@ function sound_out_word(pos1, axis, direction)
 		local nodenamearray = split(nodename, ":")
 		local nodename_prefix = nodenamearray[1]
 		local nodename_suffix = nodenamearray[2]
-		minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
-		minetest.chat_send_all("axis:" .. axis ..">" )
+		--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
+		--minetest.chat_send_all("axis:" .. axis ..">" )
 		local delay = phonics[nodename_suffix]
 		if  delay ~=nil and nodename_prefix =="phonics"  then 		
-			local duration = 1			
 			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
               lpos.x = mpos.x 
               lpos.y = mpos.y 
               lpos.z = mpos.z 	
-			minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, duration})
+			minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, phonics[nodename_suffix].length}) 
 			cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
 		end
 	until nodename_prefix ~="phonics"	
@@ -272,55 +164,16 @@ minetest.register_on_punchnode( function(pos, node, puncher)
 --activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
 	hit_with = puncher:get_wielded_item()
 	wear=hit_with:get_wear()
-if node.name == "phonics:a" 
+--if we have punched a phonics node in the phonics table then activate it.	
+for key,value in pairs(phonics) do  
+if node.name == "phonics:"..key
  then 
  	if wear == 0 then
-		activate_node({pos, "a", 1.1})
+		activate_node({pos, key, phonics[key].length})
 	end
-end
-if node.name == "phonics:c" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "c", .4})
-	end
-end
-if node.name == "phonics:i" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "i", 2.0})
-	end
-end
-if node.name == "phonics:l" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "l", 2.0})
-	end
-end
-if node.name == "phonics:m" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "m", 2.0})
-	end
-end
-if node.name == "phonics:o" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "o", 1.4})
-	end
-end
-if node.name == "phonics:x" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "x", .6})
-	end
-end
-if node.name == "phonics:t" 
- then 
- 	if wear == 0 then  
-		activate_node({pos, "t", .3})
-	end
-end
-
+end	 
+end	 	
+	
 if node.name == "phonics:SayWord" 
  then 
  	--if current_word =
@@ -331,7 +184,6 @@ if node.name == "phonics:SayWord"
 end
 end 
  )
-
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
  	--minetest.env:dig_node(pos) 
