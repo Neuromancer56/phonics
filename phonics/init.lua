@@ -41,11 +41,16 @@ phonics = {
 	f={name="f", length=2.0, gain=1},
 	g={name="g", length=.14, gain=1},
 	i={name="i", length=2.0, gain=1},
+	k={name="k", length=.3, gain=1},
 	l={name="l", length=2.0, gain=1},
 	m={name="m", length=2.0, gain=1},
+	n={name="n", length=2.0, gain=1},
 	o={name="o", length=2.0, gain=1},
+	r={name="r", length=2.0, gain=1},
 	s={name="s", length=2.0, gain=1},
 	t={name="t", length=.3, gain=1},
+	u={name="u", length=2.0, gain=1},
+	th={name="th", length=.18, gain=1},
 	x={name="x", length=.6, gain=1}		
 }
 
