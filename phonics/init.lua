@@ -33,11 +33,18 @@
 phonics = {
 	--handler = {},
 	a={name="a", length=1.2, gain=1},
+	b={name="b", length=.71, gain=1},
 	c={name="c", length=.3, gain=1},
+	d={name="d", length=.77, gain=1},
+	e={name="e", length=1.38, gain=1},
+	e_={name="e_", length=2.0, gain=1},
+	f={name="f", length=2.0, gain=1},
+	g={name="g", length=.14, gain=1},
 	i={name="i", length=2.0, gain=1},
 	l={name="l", length=2.0, gain=1},
 	m={name="m", length=2.0, gain=1},
 	o={name="o", length=2.0, gain=1},
+	s={name="s", length=2.0, gain=1},
 	t={name="t", length=.3, gain=1},
 	x={name="x", length=.6, gain=1}		
 }
