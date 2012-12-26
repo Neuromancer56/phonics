@@ -67,7 +67,6 @@ for key,value in pairs(phonics) do
 	sounds = default.node_sound_stone_defaults(),
 	})
 	minetest.register_node("phonics:"..key.."_active", {
-	description = key.."_active",
 	tiles = {key.."_active.png"},
 	light_source = 20,
 	is_ground_content = true,
