@@ -33,6 +33,7 @@
 phonics = {
 	--handler = {},
 	a={name="a", length=1.2, gain=1},
+	a_={name="a_", length=2.0, gain=1},
 	b={name="b", length=.71, gain=1},
 	c={name="c", length=.3, gain=1},
 	d={name="d", length=.77, gain=1},
@@ -40,17 +41,23 @@ phonics = {
 	e_={name="e_", length=2.0, gain=1},
 	f={name="f", length=2.0, gain=1},
 	g={name="g", length=.14, gain=1},
+	h={name="h", length=.48, gain=1},
 	i={name="i", length=2.0, gain=1},
+	i_={name="i_", length=1.2, gain=1},
 	k={name="k", length=.3, gain=1},
 	l={name="l", length=2.0, gain=1},
 	m={name="m", length=2.0, gain=1},
 	n={name="n", length=2.0, gain=1},
 	o={name="o", length=2.0, gain=1},
+	o_={name="o_", length=2.0, gain=1},
 	r={name="r", length=2.0, gain=1},
 	s={name="s", length=2.0, gain=1},
+	sh={name="sh", length=2.0, gain=1},
 	t={name="t", length=.3, gain=1},
-	u={name="u", length=2.0, gain=1},
 	th={name="th", length=.18, gain=1},
+	u={name="u", length=2.0, gain=1},	
+	v={name="v", length=2.0, gain=1},
+	w={name="w", length=.45, gain=1},
 	x={name="x", length=.6, gain=1}		
 }
 
@@ -67,10 +74,11 @@ for key,value in pairs(phonics) do
 	sounds = default.node_sound_stone_defaults(),
 	})
 	minetest.register_node("phonics:"..key.."_active", {
+	description = key.."_active",
 	tiles = {key.."_active.png"},
 	light_source = 20,
 	is_ground_content = true,
-	groups = {cracky=3, choppy=3},
+	groups = {cracky=3, choppy=3, not_in_creative_inventory=1},
 	sounds = default.node_sound_stone_defaults(),
 })
 	
