@@ -36,7 +36,7 @@ phonics = {
 	a_={name="a_", length=.5, gain=1, is_letter=0},
 	ar={name="ar", length=.93, gain=1, is_letter=0},
 	au={name="au", length=.52, gain=1, is_letter=0},
-	b={name="b", length=.71, gain=1, is_letter=1},
+	b={name="b", length=.35, gain=1, is_letter=1},
 	c={name="c", length=.3, gain=1, is_letter=1},
 	ch={name="ch", length=.17, gain=1, is_letter=0},
 	d={name="d", length=.77, gain=1, is_letter=1},
