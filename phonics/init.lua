@@ -10,6 +10,15 @@
 
 --This mod has a long way to go: 
 --Plan for enhancements (being worked on):
+--Add a chat command allowing a teaching player to type in words that appear as phonics.  That way the learning player must either 
+--read what the teacher types in chat, or sound out the phonics blocks that appear above the teacher's head.  Then it is just free play
+--in whatever peak's the learner's interest.
+--Chat command /ph will display a Sentence Block, plus what they typed with a sayWord block in front of every word.
+--if the sentence block is deleted, the whole sentence is deleted.
+--to display "ar" type a+r, to display long e, type "e_", to display silent e, type Se
+
+
+
 --Left Clicking (punching) on the mouth block left click says a word it wants you to spell 
 --followed by sounding out what you have spelled to the right of it.
 --if what you have spelled matches one of the spellings for the mouth the block is looking for it makes a
@@ -59,7 +68,7 @@ phonics = {
 	oo_={name="oo_", length=.65, gain=1, is_letter=0},
 	oo={name="oo", length=.65, gain=1, is_letter=0},
 	ou={name="ou", length=.6, gain=1, is_letter=0},
-	p={name="p", length=.13, gain=1, is_letter=1},
+	p={name="p", length=.35, gain=1, is_letter=1},
 	q={name="q", length=.15, gain=1, is_letter=1},
 	r={name="r", length=.65, gain=1, is_letter=1},
 	s={name="s", length=.65, gain=1, is_letter=1},
@@ -79,6 +88,8 @@ phonics = {
 local words = {
 	cat={spellings={ {c},{a},{t} } }
 }
+local page_start
+local page_end
 
 for key,value in pairs(phonics) do
 	minetest.register_node("phonics:"..key, {
@@ -123,6 +134,58 @@ minetest.register_node("phonics:SayWord", {
 	groups = {cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
+minetest.register_node("phonics:PaperStart", {
+	description = "Paper Start",
+	tiles = {
+	"white.jpg",
+	"white.jpg",
+	"nicubunu_Scroll.png",
+	"nicubunu_Scroll.png",
+	"nicubunu_Scroll.png",
+	"nicubunu_Scroll.png",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos)        
+		get_page_start_loc(pos)
+	end
+})
+minetest.register_node("phonics:PaperFinish", {
+	description = "Paper Finish",
+	tiles = {
+	"white.jpg",
+	"white.jpg",
+	"finish_line_flag_pin_th.png",
+	"finish_line_flag_pin_th.png",
+	"finish_line_flag_pin_th.png",
+	"finish_line_flag_pin_th.png",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos)
+		blank_page(pos)
+	end
+})
+minetest.register_node("phonics:BlankPaper", {
+	description = "Blank Paper",
+	tiles = {
+	"white.jpg",
+	"white.jpg",
+	"white.jpg",
+	"white.jpg",
+	"white.jpg",
+	"white.jpg",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3,not_in_creative_inventory=1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 
 function split(str, pat)
    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
@@ -201,6 +264,63 @@ function sound_out_word(pos1, axis, direction)
 	until nodename_prefix ~="phonics"	
 end
 
+function get_page_start_loc(pos)
+	page_start = pos
+	minetest.chat_send_all("get_page_start_loc pos.x:" .. page_start.x ..">" )
+	
+end
+function blank_page(pos)
+	local page_end = pos
+--	page_end.x = pos.x 
+--	page_end.y = pos.y 
+--	page_end.z = pos.z 
+	if page_start ~= nil then 
+		minetest.chat_send_all("blank_page pos.x:" .. pos.x ..">" )
+		minetest.chat_send_all("page_end.y:" .. page_end.y ..">" )
+		minetest.chat_send_all("page_start.y:" .. page_start.y ..">" )
+		if page_end.y <= page_start.y then  --if the page end block was placed at or below page start block
+			if page_end.x == page_start.x then
+				minetest.chat_send_all("build page on x axis:")
+				buildwall(page_start.z, pos.z, page_start.y, pos.y, "x", pos.x, "phonics:BlankPaper")	
+			end
+			if page_end.z == page_start.z then  
+				minetest.chat_send_all("build page on z axis:")
+				buildwall(page_start.x, pos.x, page_start.y, pos.y, "z", pos.z, "phonics:BlankPaper")	
+			end	
+		end	
+	end 
+end
+
+function buildwall(hstart, hend, ystart, yend, haxis, haxis_fixed, nodename)	
+	repeat
+	minetest.chat_send_all("buildwall ystart:"..ystart)
+	buildrow(hstart, hend, ystart, haxis, haxis_fixed, nodename)
+	ystart = ystart -1
+	until ystart < yend
+end
+
+function buildrow(hstart, hend, y, haxis, haxis_fixed, nodename)
+	local hpos = math.min(hstart, hend)
+	local hmax = math.max(hstart, hend)
+	local current_pos={}
+	current_pos.y = y
+	repeat
+		minetest.chat_send_all("buildrow hpos:"..hpos)
+		if haxis =="x" then
+			current_pos.z = hpos
+			currest_pos.x = haxis_fixed		
+		end
+		if haxis =="z" then
+			current_pos.x = hpos
+			current_pos.z = haxis_fixed		
+		end	
+		minetest.env:add_node(current_pos, {name=nodename})
+		hpos = hpos +1
+	until hpos> hend
+end
+
+
+
 minetest.register_on_punchnode( function(pos, node, puncher)
 --activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
 	hit_with = puncher:get_wielded_item()
@@ -223,6 +343,11 @@ if node.name == "phonics:SayWord"
     sound_out_word(pos, "z", 1)
     sound_out_word(pos, "z", -1)
 end
+if node.name == "phonics:PageStart" 
+ then 
+end
+
+
 end 
  )
 print("Phonics Mod Loaded!")
