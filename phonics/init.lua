@@ -10,6 +10,9 @@
 
 --This mod has a long way to go: 
 --Plan for enhancements (being worked on):
+--***TEST: punching a page start will not only blank the page, but reset the current_page_start so it can be written to again.
+--***put a limit on how far away page finish can be from page start on x and z axis.
+
 --Add a chat command allowing a teaching player to type in words that appear as phonics.  That way the learning player must either 
 --read what the teacher types in chat, or sound out the phonics blocks that appear above the teacher's head.  Then it is just free play
 --in whatever peak's the learner's interest.
@@ -36,7 +39,8 @@
 --someday have an NPC Tutor.
 
 --TODO:
---remove activated nodes from creative inventory.
+--punch scroll blanks the page again.
+--dig scroll deletes the page.
 
 
 phonics = {
@@ -98,6 +102,9 @@ for key,value in pairs(phonics) do
 	is_ground_content = true,
 	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
+	on_punch = function(pos, node, puncher)        
+		activate_node({pos, key, phonics[key].length})
+	end,	
 	})
 	minetest.register_node("phonics:"..key.."_active", {
 	description = key.."_active",
@@ -133,6 +140,12 @@ minetest.register_node("phonics:SayWord", {
 	paramtype2 = "facedir",
 	groups = {cracky=3},
 	sounds = default.node_sound_stone_defaults(),
+	on_punch = function(pos, node, puncher) 
+		sound_out_word(pos, "x", 1)
+	    sound_out_word(pos, "x", -1)
+	    sound_out_word(pos, "z", 1)
+	    sound_out_word(pos, "z", -1)       
+	end
 })
 minetest.register_node("phonics:PaperStart", {
 	description = "Paper Start",
@@ -151,10 +164,22 @@ minetest.register_node("phonics:PaperStart", {
 	after_place_node = function(pos)        
 		get_page_start_loc(pos)
 	end,
-	on_punchnode = function(pos)        
-		blank_page(pos)
+	on_punch = function(pos, node, puncher)        
+		replace_page(pos, "x", 1, "phonics:BlankPaper")
+	    replace_page(pos, "x", -1, "phonics:BlankPaper")
+	    replace_page(pos, "z", 1, "phonics:BlankPaper")
+	    replace_page(pos, "z", -1, "phonics:BlankPaper")
+	    replace_column(pos, "phonics:BlankPaper")
+	    page_start = pos
+	end,		
+	on_dig = function(pos_dig,node)
+		replace_page(pos_dig, "x", 1, "air")
+	    replace_page(pos_dig, "x", -1, "air")
+	    replace_page(pos_dig, "z", 1, "air")
+	    replace_page(pos_dig, "z", -1, "air")
+	    minetest.chat_send_all("pos.y" .. pos_dig.y ..">" )
+	    replace_column(pos_dig, "air")
 	end
-
 })
 minetest.register_node("phonics:PaperFinish", {
 	description = "Paper Finish",
@@ -268,6 +293,69 @@ function sound_out_word(pos1, axis, direction)
 	until nodename_prefix ~="phonics"	
 end
 
+function replace_page(pos, axis, direction,new_nodename)
+	local replace_row_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+      replace_row_pos.x = pos.x 
+      replace_row_pos.y = pos.y 
+      replace_row_pos.z = pos.z 
+	repeat
+		local current_nodename = minetest.env:get_node(replace_row_pos).name 
+		local nodenamearray = split(current_nodename, ":")
+		local nodename_prefix = nodenamearray[1]
+		local nodename_suffix = nodenamearray[2]
+		replace_page_row(replace_row_pos, axis, direction,new_nodename)
+		replace_row_pos.y = replace_row_pos.y-1
+	until nodename_prefix ~="phonics"	
+end
+
+function replace_column(pos, new_nodename)
+	replace_column_pos= pos
+	repeat
+		minetest.chat_send_all("replace_column_pos.y:" .. replace_column_pos.y ..">" )
+		local current_nodename = minetest.env:get_node(replace_column_pos).name 
+		local nodenamearray = split(current_nodename, ":")
+		local nodename_prefix = nodenamearray[1]
+		local nodename_suffix = nodenamearray[2]
+		if nodename_prefix =="phonics" then	
+			if new_nodename =="air" then					
+				minetest.env:add_node(replace_column_pos, {name=new_nodename})			
+			end
+			if new_nodename =="phonics:BlankPaper" and current_nodename ~="phonics:PaperStart" then					
+				minetest.env:add_node(replace_column_pos, {name=new_nodename})			
+			end
+		end
+		replace_column_pos.y = replace_column_pos.y-1
+	until nodename_prefix ~="phonics"
+end
+
+function replace_page_row(pos, axis, direction, new_nodename)
+	local replace_pointer = {} --needed this because the node being passed to revertnode was incremented (must have been by reference
+	replace_pointer.x = pos.x 
+    replace_pointer.y = pos.y 
+    replace_pointer.z = pos.z 	
+	repeat
+		if axis == "x" then
+			replace_pointer.x=replace_pointer.x+direction
+		end	
+		if axis == "z" then
+			replace_pointer.z=replace_pointer.z+direction
+		end	
+		local nodename = minetest.env:get_node(replace_pointer).name 
+		local nodenamearray = split(nodename, ":")
+		local nodename_prefix = nodenamearray[1]
+		local nodename_suffix = nodenamearray[2]
+		--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
+		--minetest.chat_send_all("axis:" .. axis ..">" )
+		if  nodename_prefix =="phonics"  then 		
+--			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+--              lpos.x = mpos.x 
+--              lpos.y = mpos.y 
+--              lpos.z = mpos.z 	
+			minetest.env:add_node(replace_pointer, {name=new_nodename})
+		end
+	until nodename_prefix ~="phonics"	
+end
+
 function get_page_start_loc(pos)
 	page_start = pos
 	minetest.chat_send_all("get_page_start_loc pos.x:" .. page_start.x ..">" )
@@ -278,7 +366,7 @@ function blank_page(pos)
 --	page_end.x = pos.x 
 --	page_end.y = pos.y 
 --	page_end.z = pos.z 
-	if page_start ~= nil then 
+	if page_start ~= nil and math.abs(page_start.x-page_end.x) <20 and math.abs(page_start.y-page_end.y) <20 and math.abs(page_start.z-page_end.z) <20 then 
 --		minetest.chat_send_all("blank_page pos.x:" .. pos.x ..">" )
 --		minetest.chat_send_all("page_end.y:" .. page_end.y ..">" )
 --		minetest.chat_send_all("page_start.y:" .. page_start.y ..">" )
@@ -326,35 +414,35 @@ end
 
 
 
-minetest.register_on_punchnode( function(pos, node, puncher)
---activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
-	hit_with = puncher:get_wielded_item()
-	wear=hit_with:get_wear()
---if we have punched a phonics node in the phonics table then activate it.	
-for key,value in pairs(phonics) do  
-if node.name == "phonics:"..key
- then 
- 	if wear == 0 then
-		activate_node({pos, key, phonics[key].length})
-	end
-end	 
-end	 	
-	
-if node.name == "phonics:SayWord" 
- then 
- 	--if current_word =
-    sound_out_word(pos, "x", 1)
-    sound_out_word(pos, "x", -1)
-    sound_out_word(pos, "z", 1)
-    sound_out_word(pos, "z", -1)
-end
-if node.name == "phonics:PageStart" 
- then 
-end
-
-
-end 
- )
+--minetest.register_on_punchnode( function(pos, node, puncher)
+----activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
+--	hit_with = puncher:get_wielded_item()
+--	wear=hit_with:get_wear()
+----if we have punched a phonics node in the phonics table then activate it.	
+--for key,value in pairs(phonics) do  
+--if node.name == "phonics:"..key
+-- then 
+-- 	if wear == 0 then
+--		activate_node({pos, key, phonics[key].length})
+--	end
+--end	 
+--end	 	
+--	
+--if node.name == "phonics:SayWord" 
+-- then 
+-- 	--if current_word =
+--    sound_out_word(pos, "x", 1)
+--    sound_out_word(pos, "x", -1)
+--    sound_out_word(pos, "z", 1)
+--    sound_out_word(pos, "z", -1)
+--end
+--if node.name == "phonics:PageStart" 
+-- then 
+--end
+--
+--
+--end 
+-- )
  minetest.register_chatcommand("w", {
 	params = "<message>",
 	description = "Write phonics message on a page",
