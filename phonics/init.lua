@@ -150,7 +150,11 @@ minetest.register_node("phonics:PaperStart", {
 	sounds = default.node_sound_stone_defaults(),
 	after_place_node = function(pos)        
 		get_page_start_loc(pos)
+	end,
+	on_punchnode = function(pos)        
+		blank_page(pos)
 	end
+
 })
 minetest.register_node("phonics:PaperFinish", {
 	description = "Paper Finish",
@@ -270,21 +274,19 @@ function get_page_start_loc(pos)
 	
 end
 function blank_page(pos)
-	local page_end = pos
+	page_end = pos
 --	page_end.x = pos.x 
 --	page_end.y = pos.y 
 --	page_end.z = pos.z 
 	if page_start ~= nil then 
-		minetest.chat_send_all("blank_page pos.x:" .. pos.x ..">" )
-		minetest.chat_send_all("page_end.y:" .. page_end.y ..">" )
-		minetest.chat_send_all("page_start.y:" .. page_start.y ..">" )
+--		minetest.chat_send_all("blank_page pos.x:" .. pos.x ..">" )
+--		minetest.chat_send_all("page_end.y:" .. page_end.y ..">" )
+--		minetest.chat_send_all("page_start.y:" .. page_start.y ..">" )
 		if page_end.y <= page_start.y then  --if the page end block was placed at or below page start block
 			if page_end.x == page_start.x then
-				minetest.chat_send_all("build page on x axis:")
 				buildwall(page_start.z, pos.z, page_start.y, pos.y, "x", pos.x, "phonics:BlankPaper")	
 			end
 			if page_end.z == page_start.z then  
-				minetest.chat_send_all("build page on z axis:")
 				buildwall(page_start.x, pos.x, page_start.y, pos.y, "z", pos.z, "phonics:BlankPaper")	
 			end	
 		end	
@@ -302,21 +304,24 @@ end
 function buildrow(hstart, hend, y, haxis, haxis_fixed, nodename)
 	local hpos = math.min(hstart, hend)
 	local hmax = math.max(hstart, hend)
+	minetest.chat_send_all("buildrow hmax:"..hmax)
 	local current_pos={}
 	current_pos.y = y
 	repeat
 		minetest.chat_send_all("buildrow hpos:"..hpos)
 		if haxis =="x" then
 			current_pos.z = hpos
-			currest_pos.x = haxis_fixed		
+			current_pos.x = haxis_fixed		
 		end
 		if haxis =="z" then
 			current_pos.x = hpos
 			current_pos.z = haxis_fixed		
 		end	
-		minetest.env:add_node(current_pos, {name=nodename})
+		if minetest.env:get_node(current_pos).name ~= "phonics:PaperStart" then   --leave paperstart node there.
+			minetest.env:add_node(current_pos, {name=nodename})
+		end
 		hpos = hpos +1
-	until hpos> hend
+	until hpos> hmax
 end
 
 
@@ -350,6 +355,19 @@ end
 
 end 
  )
+ minetest.register_chatcommand("w", {
+	params = "<message>",
+	description = "Write phonics message on a page",
+	privs = {shout=true},
+	func = function(name, param)
+		if page_start == nil or page_end == nil then minetest.chat_send_player(name, "You need to create a page first") return end
+		write_message(param)
+	end,		})
+	
+function write_message(param)
+	minetest.chat_send_all("write_message function called with:"..param)
+end	
+ 
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
  	--minetest.env:dig_node(pos) 
