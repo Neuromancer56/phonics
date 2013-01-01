@@ -42,11 +42,14 @@
 --punch scroll blanks the page again.
 --dig scroll deletes the page.
 
+local page_start
+local page_end
+local message_index
 
 phonics = {
 	--handler = {},
 	a={name="a", length=.4, gain=1, is_letter=1},
-	a_={name="a_", length=.5, gain=1, is_letter=0},
+	_a={name="_a", length=.5, gain=1, is_letter=0},
 	ar={name="ar", length=.93, gain=1, is_letter=0},
 	au={name="au", length=.52, gain=1, is_letter=0},
 	b={name="b", length=.35, gain=1, is_letter=1},
@@ -54,13 +57,13 @@ phonics = {
 	ch={name="ch", length=.17, gain=1, is_letter=0},
 	d={name="d", length=.77, gain=1, is_letter=1},
 	e={name="e", length=.65, gain=1, is_letter=1},
-	e_={name="e_", length=.64, gain=1, is_letter=0},
+	_e={name="_e", length=.64, gain=1, is_letter=0},
 	er={name="er", length=.65, gain=1, is_letter=0},
 	f={name="f", length=.7, gain=1, is_letter=1},
 	g={name="g", length=.14, gain=1, is_letter=1},
 	h={name="h", length=.48, gain=1, is_letter=1},
 	i={name="i", length=.65, gain=1, is_letter=1},
-	i_={name="i_", length=.45, gain=1, is_letter=0},
+	_i={name="_i", length=.45, gain=1, is_letter=0},
 	ing={name="ing", length=.67, gain=1, is_letter=0},
 	j={name="j", length=.20, gain=1, is_letter=1},
 	k={name="k", length=.3, gain=1, is_letter=1},
@@ -68,8 +71,8 @@ phonics = {
 	m={name="m", length=.65, gain=1, is_letter=1},
 	n={name="n", length=.65, gain=1, is_letter=1},
 	o={name="o", length=.65, gain=1, is_letter=1},
-	o_={name="o_", length=.65, gain=1, is_letter=0},
-	oo_={name="oo_", length=.65, gain=1, is_letter=0},
+	_o={name="_o", length=.65, gain=1, is_letter=0},
+	_oo={name="_oo", length=.65, gain=1, is_letter=0},
 	oo={name="oo", length=.65, gain=1, is_letter=0},
 	ou={name="ou", length=.6, gain=1, is_letter=0},
 	p={name="p", length=.35, gain=1, is_letter=1},
@@ -80,7 +83,7 @@ phonics = {
 	t={name="t", length=.3, gain=1, is_letter=1},
 	th={name="th", length=.18, gain=1, is_letter=0},
 	u={name="u", length=.65, gain=1, is_letter=1},	
-	u_={name="u_", length=.92, gain=1, is_letter=0},	
+	_u={name="_u", length=.92, gain=1, is_letter=0},	
 	v={name="v", length=.65, gain=1, is_letter=1},
 	w={name="w", length=.45, gain=1, is_letter=1},
 	wh={name="wh", length=.23, gain=1, is_letter=0},
@@ -89,35 +92,54 @@ phonics = {
 	z={name="z", length=.65, gain=1, is_letter=1}
 }
 
+two_char_phonics = {
+	ar= {name="ar"},
+	au= {name="au"},
+	ch= {name="ch"},
+	er= {name="er"},
+	oo= {name="oo"},
+	ou= {name="ou"},
+	sh= {name="sh"},
+	th= {name="th"},
+	wh= {name="wh"}	
+}
+
+three_char_phonics = {
+	ing= {name="ing"}
+}
+
 local words = {
 	cat={spellings={ {c},{a},{t} } }
 }
-local page_start
-local page_end
+
 
 for key,value in pairs(phonics) do
 	minetest.register_node("phonics:"..key, {
 	description = key,
-	tiles = {key..".jpg"},
+	tiles = {"phonics_"..key..".jpg"},
 	is_ground_content = true,
 	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
-	on_punch = function(pos, node, puncher)        
-		activate_node({pos, key, phonics[key].length})
+	on_punch = function(pos, node, puncher) 
+		hit_with = puncher:get_wielded_item()
+		wear=hit_with:get_wear()
+ 		if wear == 0 then       
+			activate_node({pos, key, phonics[key].length})
+		end
 	end,	
 	})
 	minetest.register_node("phonics:"..key.."_active", {
 	description = key.."_active",
-	tiles = {key.."_active.png"},
+	tiles = {"phonics_"..key.."_active.png"},
 	light_source = 20,
 	is_ground_content = true,
 	groups = {cracky=3, choppy=3, not_in_creative_inventory=1},
 	sounds = default.node_sound_stone_defaults(),
 	})	
 	if  phonics[key].is_letter ==1 then	
-		minetest.register_node("phonics:"..key.."_silent", {
+		minetest.register_node("phonics:0"..key, {
 		description = "Silent "..key,
-		tiles = {key.."_silent.png"},
+		tiles = {"phonics_0"..key..".png"},
 		is_ground_content = true,
 		groups = {cracky=3, choppy=3},
 		sounds = default.node_sound_stone_defaults(),
@@ -165,12 +187,13 @@ minetest.register_node("phonics:PaperStart", {
 		get_page_start_loc(pos)
 	end,
 	on_punch = function(pos, node, puncher)        
-		replace_page(pos, "x", 1, "phonics:BlankPaper")
-	    replace_page(pos, "x", -1, "phonics:BlankPaper")
-	    replace_page(pos, "z", 1, "phonics:BlankPaper")
-	    replace_page(pos, "z", -1, "phonics:BlankPaper")
-	    replace_column(pos, "phonics:BlankPaper")
-	    page_start = pos
+--		replace_page(pos, "x", 1, "phonics:BlankPaper")
+--	    replace_page(pos, "x", -1, "phonics:BlankPaper")
+--	    replace_page(pos, "z", 1, "phonics:BlankPaper")
+--	    replace_page(pos, "z", -1, "phonics:BlankPaper")
+--	    replace_column(pos, "phonics:BlankPaper")
+--	    page_start = pos
+		clear_page(pos)
 	end,		
 	on_dig = function(pos_dig,node)
 		replace_page(pos_dig, "x", 1, "air")
@@ -181,6 +204,16 @@ minetest.register_node("phonics:PaperStart", {
 	    replace_column(pos_dig, "air")
 	end
 })
+
+function clear_page(pos)
+	replace_page(pos, "x", 1, "phonics:BlankPaper")
+	replace_page(pos, "x", -1, "phonics:BlankPaper")
+	replace_page(pos, "z", 1, "phonics:BlankPaper")
+	replace_page(pos, "z", -1, "phonics:BlankPaper")
+	replace_column(pos, "phonics:BlankPaper")
+	page_start = pos
+end
+	    
 minetest.register_node("phonics:PaperFinish", {
 	description = "Paper Finish",
 	tiles = {
@@ -238,7 +271,7 @@ end
 local play_sound = function(list, soundname)
 		local gain = 1.0
 		--minetest.chat_send_all("list[number].name" .. list[number].name ..">" )
-		local handler = minetest.sound_play(soundname, {gain=gain})
+		local handler = minetest.sound_play("phonics_"..soundname, {gain=gain})
 end
 
 function revertnode(parms)  
@@ -291,6 +324,142 @@ function sound_out_word(pos1, axis, direction)
 			cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
 		end
 	until nodename_prefix ~="phonics"	
+end
+
+function write_message_to_page(message)
+	--*****going to need to blank page here
+	local start_page_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+    start_page_pos.x = page_start.x 
+    start_page_pos.y = page_start.y 
+    start_page_pos.z = page_start.z 	
+	--clear_page(start_page_pos)
+	local start_message_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+      start_message_pos.x = page_start.x 
+      start_message_pos.y = page_start.y 
+      start_message_pos.z = page_start.z 
+    minetest.chat_send_all("write_message_to_page:ps.x" .. page_start.x ..">" )  
+	write_message_to_page_on_axis(start_message_pos, "x", 1, message)
+	write_message_to_page_on_axis(start_message_pos, "x", -1, message)
+	write_message_to_page_on_axis(start_message_pos, "z", 1, message)
+	write_message_to_page_on_axis(start_message_pos, "z", -1, message)	
+end
+
+function write_message_to_page_on_axis(pos, axis, direction,message)
+	local page_position = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+    page_position.x = pos.x 
+    page_position.y = pos.y 
+    page_position.z = pos.z 
+    message_index = 1
+    minetest.chat_send_all("write_message_to_page_on_axis:messageindex" .. message_index ..">" ) 
+    --if the first node after the PageStart node is not a phonic, skip everything.
+    local first_position = {}    
+    first_position.x = pos.x 
+    first_position.y = pos.y 
+    first_position.z = pos.z 
+    if axis=="x" then
+    	first_position.x = first_position.x +direction
+    end
+    if axis=="z" then
+    	first_position.z = first_position.z +direction
+    end
+    local first_nodename = minetest.env:get_node(first_position).name 
+	local firstnamearray = split(first_nodename, ":")
+	local firstname_prefix = firstnamearray[1]
+	if firstname_prefix == "phonics" then  --we have phonics on this axis		      
+		repeat
+			local current_nodename = minetest.env:get_node(page_position).name 
+			local nodenamearray = split(current_nodename, ":")
+			local nodename_prefix = nodenamearray[1]
+			local nodename_suffix = nodenamearray[2]
+			write_page_row(page_position, axis, direction,message)
+			page_position.y = page_position.y-1
+		until nodename_prefix ~="phonics" or message_index > string.len(message)		
+	end
+end
+
+
+function write_page_row(pos, axis, direction, message)
+	local replace_pointer = {} --needed this because the node being passed to revertnode was incremented (must have been by reference
+	replace_pointer.x = pos.x 
+    replace_pointer.y = pos.y 
+    replace_pointer.z = pos.z 
+    minetest.chat_send_all("write_page_row:messageindex:" .. replace_pointer.x ..">" ) 
+	local nodename = minetest.env:get_node(replace_pointer).name 
+	if nodename=="phonics:PaperStart" then
+		if axis == "x" then
+			replace_pointer.x=replace_pointer.x+direction
+		end	
+		if axis == "z" then
+			replace_pointer.z=replace_pointer.z+direction
+		end	
+	end	
+--1get me node at current location
+--2if node prefix is phonics then replace node with next phonic in the message
+--3(and have some code behind the scenes automatically bump the message_index)
+--4increment the replace pointer
+--5repeat 1-4 until node prefix at current location is not phonics
+	repeat
+		local nodename = minetest.env:get_node(replace_pointer).name 
+		local nodenamearray = split(nodename, ":")
+		local nodename_prefix = nodenamearray[1]
+		local nodename_suffix = nodenamearray[2]
+		if nodename_prefix =="phonics"  then 			
+			if new_nodename =="phonics:BlankPaper" then
+			--if we had a space between words then inject sayword block into stream
+				new_nodename ="phonics:SayWord"
+				minetest.env:add_node(replace_pointer, {name=new_nodename})					
+			else
+				new_nodename = get_next_phonic_in_message(message)
+				minetest.chat_send_all("write_page_row:NODETOWRITE:< phonics:"..new_nodename ..">" ) 
+				minetest.env:add_node(replace_pointer, {name=new_nodename})			
+			end	
+			if axis == "x" then
+				replace_pointer.x=replace_pointer.x+direction
+			end	
+			if axis == "z" then
+				replace_pointer.z=replace_pointer.z+direction
+			end				
+		end
+		minetest.chat_send_all("write_page_row:nodename_prefix: " .. nodename_prefix ..">" ) 
+	until nodename_prefix ~="phonics" or message_index > string.len(message)	
+end
+
+function get_next_phonic_in_message(message)
+--and have some code behind the scenes automatically bump the message_index	
+	minetest.chat_send_all("get_next_phonic_in_message:message_index:"..message_index ..">" ) 
+	minetest.chat_send_all("get_next_phonic_in_message:string.len:"..string.len(message)..">" ) 
+	string.len(message)
+	if message_index <= string.len(message) then
+		local current_char_in_message = string.sub(message,message_index,message_index)	
+		phonic_builder = current_char_in_message
+		--if currentchar=" " then just set cpim to blankPaper and skip all the char business"
+		if current_char_in_message==" " then 
+			current_phonic_in_message = "phonics:BlankPaper"
+		else
+			if current_char_in_message == "0" or current_char_in_message == "_" then			
+				message_index = message_index +1
+				current_char_in_message = string.sub(message,message_index,message_index)		
+				phonic_builder = phonic_builder..current_char_in_message
+			end	
+			char_after_current_char = string.sub(message,message_index+1,message_index+1)
+			third_char = string.sub(message,message_index+2,message_index+2)
+			two_chars = current_char_in_message..char_after_current_char
+			three_chars = two_chars..third_char		 
+			if two_char_phonics[two_chars] ~= nil then										
+				phonic_builder = phonic_builder..char_after_current_char
+				message_index = message_index +1
+			end	
+			if three_char_phonics[three_chars] ~= nil then						
+				phonic_builder = phonic_builder..string.sub(message,message_index+1,message_index+2)
+				message_index = message_index +2
+			end			
+			current_phonic_in_message = "phonics:"..phonic_builder
+		end
+		message_index = message_index +1	
+	else
+		current_phonic_in_message = "phonics:BlankPaper"
+	end 	
+	return current_phonic_in_message			
 end
 
 function replace_page(pos, axis, direction,new_nodename)
@@ -412,38 +581,7 @@ function buildrow(hstart, hend, y, haxis, haxis_fixed, nodename)
 	until hpos> hmax
 end
 
-
-
---minetest.register_on_punchnode( function(pos, node, puncher)
-----activated nodes cannot be dug.  Need to not activate when punched by item that has wear.
---	hit_with = puncher:get_wielded_item()
---	wear=hit_with:get_wear()
-----if we have punched a phonics node in the phonics table then activate it.	
---for key,value in pairs(phonics) do  
---if node.name == "phonics:"..key
--- then 
--- 	if wear == 0 then
---		activate_node({pos, key, phonics[key].length})
---	end
---end	 
---end	 	
---	
---if node.name == "phonics:SayWord" 
--- then 
--- 	--if current_word =
---    sound_out_word(pos, "x", 1)
---    sound_out_word(pos, "x", -1)
---    sound_out_word(pos, "z", 1)
---    sound_out_word(pos, "z", -1)
---end
---if node.name == "phonics:PageStart" 
--- then 
---end
---
---
---end 
--- )
- minetest.register_chatcommand("w", {
+minetest.register_chatcommand("w", {
 	params = "<message>",
 	description = "Write phonics message on a page",
 	privs = {shout=true},
@@ -453,7 +591,7 @@ end
 	end,		})
 	
 function write_message(param)
-	minetest.chat_send_all("write_message function called with:"..param)
+	write_message_to_page(param)		
 end	
  
 print("Phonics Mod Loaded!")
