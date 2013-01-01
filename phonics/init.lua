@@ -187,12 +187,6 @@ minetest.register_node("phonics:PaperStart", {
 		get_page_start_loc(pos)
 	end,
 	on_punch = function(pos, node, puncher)        
---		replace_page(pos, "x", 1, "phonics:BlankPaper")
---	    replace_page(pos, "x", -1, "phonics:BlankPaper")
---	    replace_page(pos, "z", 1, "phonics:BlankPaper")
---	    replace_page(pos, "z", -1, "phonics:BlankPaper")
---	    replace_column(pos, "phonics:BlankPaper")
---	    page_start = pos
 		clear_page(pos)
 	end,		
 	on_dig = function(pos_dig,node)
@@ -206,12 +200,18 @@ minetest.register_node("phonics:PaperStart", {
 })
 
 function clear_page(pos)
-	replace_page(pos, "x", 1, "phonics:BlankPaper")
-	replace_page(pos, "x", -1, "phonics:BlankPaper")
-	replace_page(pos, "z", 1, "phonics:BlankPaper")
-	replace_page(pos, "z", -1, "phonics:BlankPaper")
-	replace_column(pos, "phonics:BlankPaper")
+	local clear_pos = {} --needed this because the node being passed to revertnode was incremented (must have been by reference
+      clear_pos.x = pos.x 
+      clear_pos.y = pos.y 
+      clear_pos.z = pos.z 
+
+	replace_page(clear_pos, "x", 1, "phonics:BlankPaper")
+	replace_page(clear_pos, "x", -1, "phonics:BlankPaper")
+	replace_page(clear_pos, "z", 1, "phonics:BlankPaper")
+	replace_page(clear_pos, "z", -1, "phonics:BlankPaper")
+	replace_column(clear_pos, "phonics:BlankPaper")
 	page_start = pos
+	page_end = pos
 end
 	    
 minetest.register_node("phonics:PaperFinish", {
@@ -327,7 +327,7 @@ function sound_out_word(pos1, axis, direction)
 end
 
 function write_message_to_page(message)
-	--*****going to need to blank page here
+	--*****going to need to blank page here? or just have them hit start to clear it.
 	local start_page_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
     start_page_pos.x = page_start.x 
     start_page_pos.y = page_start.y 
@@ -388,8 +388,14 @@ function write_page_row(pos, axis, direction, message)
 	if nodename=="phonics:PaperStart" then
 		if axis == "x" then
 			replace_pointer.x=replace_pointer.x+direction
+			new_nodename ="phonics:SayWord" 
+			minetest.env:add_node(replace_pointer, {name=new_nodename})	
+			replace_pointer.x=replace_pointer.x+direction
 		end	
 		if axis == "z" then
+			replace_pointer.z=replace_pointer.z+direction
+			new_nodename ="phonics:SayWord"
+			minetest.env:add_node(replace_pointer, {name=new_nodename})	
 			replace_pointer.z=replace_pointer.z+direction
 		end	
 	end	
@@ -397,7 +403,7 @@ function write_page_row(pos, axis, direction, message)
 --2if node prefix is phonics then replace node with next phonic in the message
 --3(and have some code behind the scenes automatically bump the message_index)
 --4increment the replace pointer
---5repeat 1-4 until node prefix at current location is not phonics
+--5repeat 1-4 until node prefix at current location is not phonics	
 	repeat
 		local nodename = minetest.env:get_node(replace_pointer).name 
 		local nodenamearray = split(nodename, ":")
@@ -407,7 +413,7 @@ function write_page_row(pos, axis, direction, message)
 			if new_nodename =="phonics:BlankPaper" then
 			--if we had a space between words then inject sayword block into stream
 				new_nodename ="phonics:SayWord"
-				minetest.env:add_node(replace_pointer, {name=new_nodename})					
+				minetest.env:add_node(replace_pointer, {name=new_nodename})				
 			else
 				new_nodename = get_next_phonic_in_message(message)
 				minetest.chat_send_all("write_page_row:NODETOWRITE:< phonics:"..new_nodename ..">" ) 
