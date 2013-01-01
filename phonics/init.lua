@@ -121,6 +121,7 @@ for key,value in pairs(phonics) do
 	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
 	on_punch = function(pos, node, puncher) 
+		minetest.chat_send_all("phonic.on_punch:" .. pos.x ..">" )
 		hit_with = puncher:get_wielded_item()
 		wear=hit_with:get_wear()
  		if wear == 0 then       
@@ -282,7 +283,11 @@ function revertnode(parms)
 end
 
 function activate_node(anparms)
+	minetest.chat_send_all("activate_node:nodename(2)" .. anparms[2] ..">" )
 	local pos2 = anparms[1]
+	minetest.chat_send_all("activate_node:pos2.x" .. pos2.x ..">" )
+	minetest.chat_send_all("activate_node:pos2.y" .. pos2.y ..">" )
+	minetest.chat_send_all("activate_node:pos2.z" .. pos2.z ..">" )
 	local nodename = anparms[2]
 	local duration = anparms[3]
  	minetest.env:remove_node(pos2,{name="phonics:"..nodename})
@@ -301,29 +306,107 @@ function sound_out_word(pos1, axis, direction)
       mpos.x = pos1.x 
       mpos.y = pos1.y 
       mpos.z = pos1.z 
-	repeat
-		if axis == "x" then
-			mpos.x=mpos.x+direction
-		end	
-		if axis == "z" then
-				mpos.z=mpos.z+direction
-		end	
-		local nodename = minetest.env:get_node(mpos).name 
-		local nodenamearray = split(nodename, ":")
-		local nodename_prefix = nodenamearray[1]
-		local nodename_suffix = nodenamearray[2]
-		--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
-		--minetest.chat_send_all("axis:" .. axis ..">" )
-		local delay = phonics[nodename_suffix]
-		if  delay ~=nil and nodename_prefix =="phonics"  then 		
-			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
-              lpos.x = mpos.x 
-              lpos.y = mpos.y 
-              lpos.z = mpos.z 	
-			minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, phonics[nodename_suffix].length}) 
-			cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
+   --see if there are any sounds next to mouth on this axis.  If not, do nothing.  
+	local test_pos = {} 
+      test_pos.x = pos1.x 
+      test_pos.y = pos1.y 
+      test_pos.z = pos1.z 
+	if axis == "x" then
+		test_pos.x=test_pos.x+direction
+	end	
+	if axis == "z" then
+		test_pos.z=test_pos.z+direction
+	end	
+	local test_nodename = minetest.env:get_node(test_pos).name 
+	local test_nodenamearray = split(test_nodename, ":")
+	local test_nodename_prefix = test_nodenamearray[1]
+	local test_nodename_suffix = test_nodenamearray[2]
+   	if test_nodename_prefix ~="phonics" or test_nodename_suffix == "BlankPaper" then 
+   		return
+    end
+    
+    local row_count = 1
+    repeat  --go to next row 1 time    	      
+		repeat  --continue sounding on this row until you reach blank paper or a non phonics node
+			if axis == "x" then
+				mpos.x=mpos.x+direction
+			end	
+			if axis == "z" then
+					mpos.z=mpos.z+direction
+			end	
+			local nodename = minetest.env:get_node(mpos).name 
+			local nodenamearray = split(nodename, ":")
+			local nodename_prefix = nodenamearray[1]
+			local nodename_suffix = nodenamearray[2]
+			--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
+			--minetest.chat_send_all("axis:" .. axis ..">" )
+			local delay = phonics[nodename_suffix]
+			if  delay ~=nil and nodename_prefix =="phonics"  then 		
+				local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+	              lpos.x = mpos.x 
+	              lpos.y = mpos.y 
+	              lpos.z = mpos.z 	
+				minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, phonics[nodename_suffix].length}) 
+				cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
+			end
+		until nodename_prefix ~="phonics" or nodename_suffix == "BlankPaper"
+--if I will find a BlankPaper in this row, then dont look in next row
+		local find_blank_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+      	find_blank_pos.x = mpos.x 
+      	find_blank_pos.y = mpos.y 
+      	find_blank_pos.z = mpos.z 	
+		repeat
+			--is this node BlankPaper?
+			local find_blank_nodename = minetest.env:get_node(find_blank_pos).name 
+			local find_blank_nodenamearray = split(find_blank_nodename, ":")
+			local find_blank_nodename_prefix = find_blank_nodenamearray[1]
+			local find_blank_nodename_suffix = find_blank_nodenamearray[2]			
+			--minetest.chat_send_all("BPnodename_suffix:" .. find_blank_nodename_suffix ..">" )
+			--minetest.chat_send_all("BPfind_blank_pos.x:" .. find_blank_pos.x ..">" )
+			--minetest.chat_send_all("BPfind_blank_pos.y:" .. find_blank_pos.y ..">" )
+			if find_blank_nodename_suffix == "BlankPaper" then
+				return
+			end			
+			--if not, increment pointer and repeat search
+			if axis == "x" then
+				find_blank_pos.x=find_blank_pos.x+direction
+			end	
+			if axis == "z" then
+					find_blank_pos.z=find_blank_pos.z+direction
+			end			
+		until find_blank_nodename_prefix ~="phonics"--prefix not phonics
+
+--we're not done, so search next row for more phonics to sound out
+		local new_row_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
+      	new_row_pos.x = mpos.x 
+      	new_row_pos.y = mpos.y 
+      	new_row_pos.z = mpos.z 	
+		new_row_pos.y=new_row_pos.y-1		
+		if nodename_suffix == "BlankPaper" then 
+			return
 		end
-	until nodename_prefix ~="phonics" or nodename_suffix == "BlankPaper"	
+		repeat  --go to the beginning of the new row				
+			if axis == "x" then
+				new_row_pos.x=new_row_pos.x-direction
+			end	
+			if axis == "z" then
+					new_row_pos.z=new_row_pos.z-direction
+			end	
+			local new_row_nodename = minetest.env:get_node(new_row_pos).name 
+			local new_row_nodenamearray = split(new_row_nodename, ":")
+			local new_row_nodename_prefix = new_row_nodenamearray[1]
+			local new_row_nodename_suffix = new_row_nodenamearray[2]
+			minetest.chat_send_all("new_row_nodename:" .. new_row_nodename ..">" )
+			minetest.chat_send_all("new_row_pos.x:" .. new_row_pos.x .."*" )
+			minetest.chat_send_all("new_row_pos.y:" .. new_row_pos.y .."*" )
+			mpos.x = new_row_pos.x 
+			mpos.y = new_row_pos.y
+			mpos.z = new_row_pos.z
+		until new_row_nodename_prefix ~="phonics"
+		row_count= row_count +1
+--		minetest.chat_send_all("row_count:" .. row_count ..">" )
+--		minetest.chat_send_all("nodename_suffix:" .. nodename_suffix ..">" )
+	until row_count >2 or nodename_suffix == "BlankPaper"
 end
 
 function write_message_to_page(message)
