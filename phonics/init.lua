@@ -147,6 +147,44 @@ for key,value in pairs(phonics) do
 	end
 end
 
+
+minetest.register_node("phonics:question_mark", {
+	description = "Question Mark",
+	tiles = {
+	"question_mark.png",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+--	on_punch = function(pos, node, puncher)      
+--	end
+})
+minetest.register_node("phonics:exclamation_point", {
+	description = "Exclamation Point",
+	tiles = {
+	"exclamation_point.png",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+--	on_punch = function(pos, node, puncher)      
+--	end
+})
+minetest.register_node("phonics:period", {
+	description = "Period",
+	tiles = {
+	"period.png",},
+	is_ground_content = true,
+		paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {cracky=3},
+	sounds = default.node_sound_stone_defaults(),
+--	on_punch = function(pos, node, puncher)      
+--	end
+})
+
 minetest.register_node("phonics:SayWord", {
 	description = "say word",
 	tiles = {
@@ -168,6 +206,10 @@ minetest.register_node("phonics:SayWord", {
 	    sound_out_word(pos, "z", -1)       
 	end
 })
+
+
+
+
 minetest.register_node("phonics:PaperStart", {
 	description = "Paper Start",
 	tiles = {
@@ -507,6 +549,12 @@ function get_next_phonic_in_message(message)
 		--if currentchar=" " then just set cpim to blankPaper and skip all the char business"
 		if current_char_in_message==" " then 
 			current_phonic_in_message = "phonics:BlankPaper"
+		elseif current_char_in_message=="." then 
+			current_phonic_in_message = "phonics:period"
+		elseif current_char_in_message=="?" then 
+			current_phonic_in_message = "phonics:question_mark"			
+		elseif current_char_in_message=="!" then 
+			current_phonic_in_message = "phonics:exclamation_point"						
 		else
 			if current_char_in_message == "0" or current_char_in_message == "_" then			
 				message_index = message_index +1
