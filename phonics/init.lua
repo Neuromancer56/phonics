@@ -323,7 +323,7 @@ function sound_out_word(pos1, axis, direction)
 			minetest.after(cumulative_delay, activate_node, {lpos, nodename_suffix, phonics[nodename_suffix].length}) 
 			cumulative_delay = cumulative_delay + phonics[nodename_suffix].length 
 		end
-	until nodename_prefix ~="phonics"	
+	until nodename_prefix ~="phonics" or nodename_suffix == "BlankPaper"	
 end
 
 function write_message_to_page(message)
