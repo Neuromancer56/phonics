@@ -47,7 +47,6 @@ local page_end
 local message_index
 
 phonics = {
-	--handler = {},
 	a={name="a", length=.4, gain=1, is_letter=1},
 	_a={name="_a", length=.5, gain=1, is_letter=0},
 	ar={name="ar", length=.93, gain=1, is_letter=0},
@@ -121,7 +120,7 @@ for key,value in pairs(phonics) do
 	groups = {cracky=3, choppy=3},
 	sounds = default.node_sound_stone_defaults(),
 	on_punch = function(pos, node, puncher) 
-		minetest.chat_send_all("phonic.on_punch:" .. pos.x ..">" )
+--		minetest.chat_send_all("phonic.on_punch:" .. pos.x ..">" )
 		hit_with = puncher:get_wielded_item()
 		wear=hit_with:get_wear()
  		if wear == 0 then       
@@ -147,7 +146,6 @@ for key,value in pairs(phonics) do
 	 	})	
 	end
 end
---current_word =
 
 minetest.register_node("phonics:SayWord", {
 	description = "say word",
@@ -195,7 +193,6 @@ minetest.register_node("phonics:PaperStart", {
 	    replace_page(pos_dig, "x", -1, "air")
 	    replace_page(pos_dig, "z", 1, "air")
 	    replace_page(pos_dig, "z", -1, "air")
-	    minetest.chat_send_all("pos.y" .. pos_dig.y ..">" )
 	    replace_column(pos_dig, "air")
 	end
 })
@@ -271,7 +268,6 @@ end
 
 local play_sound = function(list, soundname)
 		local gain = 1.0
-		--minetest.chat_send_all("list[number].name" .. list[number].name ..">" )
 		local handler = minetest.sound_play("phonics_"..soundname, {gain=gain})
 end
 
@@ -283,11 +279,7 @@ function revertnode(parms)
 end
 
 function activate_node(anparms)
-	minetest.chat_send_all("activate_node:nodename(2)" .. anparms[2] ..">" )
 	local pos2 = anparms[1]
-	minetest.chat_send_all("activate_node:pos2.x" .. pos2.x ..">" )
-	minetest.chat_send_all("activate_node:pos2.y" .. pos2.y ..">" )
-	minetest.chat_send_all("activate_node:pos2.z" .. pos2.z ..">" )
 	local nodename = anparms[2]
 	local duration = anparms[3]
  	minetest.env:remove_node(pos2,{name="phonics:"..nodename})
@@ -306,7 +298,7 @@ function sound_out_word(pos1, axis, direction)
       mpos.x = pos1.x 
       mpos.y = pos1.y 
       mpos.z = pos1.z 
-   --see if there are any sounds next to mouth on this axis.  If not, do nothing.  
+--see if there are any sounds next to mouth on this axis.  (or if there is a BlankPage before it.) If not, do nothing.  
 	local test_pos = {} 
       test_pos.x = pos1.x 
       test_pos.y = pos1.y 
@@ -321,9 +313,19 @@ function sound_out_word(pos1, axis, direction)
 	local test_nodenamearray = split(test_nodename, ":")
 	local test_nodename_prefix = test_nodenamearray[1]
 	local test_nodename_suffix = test_nodenamearray[2]
-   	if test_nodename_prefix ~="phonics" or test_nodename_suffix == "BlankPaper" then 
-   		return
-    end
+	--see if blank page before it		
+	if axis == "x" then
+		test_pos.x=test_pos.x-(direction*2)
+	end	
+	if axis == "z" then
+		test_pos.z=test_pos.z-(direction*2)
+	end			
+	local b4_nodename = minetest.env:get_node(test_pos).name 			
+	if b4_nodename ~="phonics:BlankPaper" then	
+	   	if test_nodename_prefix ~="phonics" or test_nodename_suffix == "BlankPaper" then 
+	   		return
+	    end
+	end
     
     local row_count = 1
     repeat  --go to next row 1 time    	      
@@ -338,8 +340,6 @@ function sound_out_word(pos1, axis, direction)
 			local nodenamearray = split(nodename, ":")
 			local nodename_prefix = nodenamearray[1]
 			local nodename_suffix = nodenamearray[2]
-			--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
-			--minetest.chat_send_all("axis:" .. axis ..">" )
 			local delay = phonics[nodename_suffix]
 			if  delay ~=nil and nodename_prefix =="phonics"  then 		
 				local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
@@ -361,9 +361,6 @@ function sound_out_word(pos1, axis, direction)
 			local find_blank_nodenamearray = split(find_blank_nodename, ":")
 			local find_blank_nodename_prefix = find_blank_nodenamearray[1]
 			local find_blank_nodename_suffix = find_blank_nodenamearray[2]			
-			--minetest.chat_send_all("BPnodename_suffix:" .. find_blank_nodename_suffix ..">" )
-			--minetest.chat_send_all("BPfind_blank_pos.x:" .. find_blank_pos.x ..">" )
-			--minetest.chat_send_all("BPfind_blank_pos.y:" .. find_blank_pos.y ..">" )
 			if find_blank_nodename_suffix == "BlankPaper" then
 				return
 			end			
@@ -396,31 +393,23 @@ function sound_out_word(pos1, axis, direction)
 			local new_row_nodenamearray = split(new_row_nodename, ":")
 			local new_row_nodename_prefix = new_row_nodenamearray[1]
 			local new_row_nodename_suffix = new_row_nodenamearray[2]
-			minetest.chat_send_all("new_row_nodename:" .. new_row_nodename ..">" )
-			minetest.chat_send_all("new_row_pos.x:" .. new_row_pos.x .."*" )
-			minetest.chat_send_all("new_row_pos.y:" .. new_row_pos.y .."*" )
 			mpos.x = new_row_pos.x 
 			mpos.y = new_row_pos.y
 			mpos.z = new_row_pos.z
 		until new_row_nodename_prefix ~="phonics"
 		row_count= row_count +1
---		minetest.chat_send_all("row_count:" .. row_count ..">" )
---		minetest.chat_send_all("nodename_suffix:" .. nodename_suffix ..">" )
 	until row_count >2 or nodename_suffix == "BlankPaper"
 end
 
 function write_message_to_page(message)
-	--*****going to need to blank page here? or just have them hit start to clear it.
 	local start_page_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
     start_page_pos.x = page_start.x 
     start_page_pos.y = page_start.y 
     start_page_pos.z = page_start.z 	
-	--clear_page(start_page_pos)
 	local start_message_pos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
       start_message_pos.x = page_start.x 
       start_message_pos.y = page_start.y 
       start_message_pos.z = page_start.z 
-    minetest.chat_send_all("write_message_to_page:ps.x" .. page_start.x ..">" )  
 	write_message_to_page_on_axis(start_message_pos, "x", 1, message)
 	write_message_to_page_on_axis(start_message_pos, "x", -1, message)
 	write_message_to_page_on_axis(start_message_pos, "z", 1, message)
@@ -433,7 +422,6 @@ function write_message_to_page_on_axis(pos, axis, direction,message)
     page_position.y = pos.y 
     page_position.z = pos.z 
     message_index = 1
-    minetest.chat_send_all("write_message_to_page_on_axis:messageindex" .. message_index ..">" ) 
     --if the first node after the PageStart node is not a phonic, skip everything.
     local first_position = {}    
     first_position.x = pos.x 
@@ -466,7 +454,6 @@ function write_page_row(pos, axis, direction, message)
 	replace_pointer.x = pos.x 
     replace_pointer.y = pos.y 
     replace_pointer.z = pos.z 
-    minetest.chat_send_all("write_page_row:messageindex:" .. replace_pointer.x ..">" ) 
 	local nodename = minetest.env:get_node(replace_pointer).name 
 	if nodename=="phonics:PaperStart" then
 		if axis == "x" then
@@ -499,7 +486,6 @@ function write_page_row(pos, axis, direction, message)
 				minetest.env:add_node(replace_pointer, {name=new_nodename})				
 			else
 				new_nodename = get_next_phonic_in_message(message)
-				minetest.chat_send_all("write_page_row:NODETOWRITE:< phonics:"..new_nodename ..">" ) 
 				minetest.env:add_node(replace_pointer, {name=new_nodename})			
 			end	
 			if axis == "x" then
@@ -509,14 +495,11 @@ function write_page_row(pos, axis, direction, message)
 				replace_pointer.z=replace_pointer.z+direction
 			end				
 		end
-		minetest.chat_send_all("write_page_row:nodename_prefix: " .. nodename_prefix ..">" ) 
 	until nodename_prefix ~="phonics" or message_index > string.len(message)	
 end
 
 function get_next_phonic_in_message(message)
 --and have some code behind the scenes automatically bump the message_index	
-	minetest.chat_send_all("get_next_phonic_in_message:message_index:"..message_index ..">" ) 
-	minetest.chat_send_all("get_next_phonic_in_message:string.len:"..string.len(message)..">" ) 
 	string.len(message)
 	if message_index <= string.len(message) then
 		local current_char_in_message = string.sub(message,message_index,message_index)	
@@ -569,7 +552,6 @@ end
 function replace_column(pos, new_nodename)
 	replace_column_pos= pos
 	repeat
-		minetest.chat_send_all("replace_column_pos.y:" .. replace_column_pos.y ..">" )
 		local current_nodename = minetest.env:get_node(replace_column_pos).name 
 		local nodenamearray = split(current_nodename, ":")
 		local nodename_prefix = nodenamearray[1]
@@ -602,13 +584,7 @@ function replace_page_row(pos, axis, direction, new_nodename)
 		local nodenamearray = split(nodename, ":")
 		local nodename_prefix = nodenamearray[1]
 		local nodename_suffix = nodenamearray[2]
-		--minetest.chat_send_all("pos1.x:" .. mpos.x ..">" )
-		--minetest.chat_send_all("axis:" .. axis ..">" )
 		if  nodename_prefix =="phonics"  then 		
---			local lpos = {}  --needed this because the node being passed to revertnode was incremented (must have been by reference
---              lpos.x = mpos.x 
---              lpos.y = mpos.y 
---              lpos.z = mpos.z 	
 			minetest.env:add_node(replace_pointer, {name=new_nodename})
 		end
 	until nodename_prefix ~="phonics"	
@@ -616,18 +592,11 @@ end
 
 function get_page_start_loc(pos)
 	page_start = pos
-	minetest.chat_send_all("get_page_start_loc pos.x:" .. page_start.x ..">" )
-	
 end
+
 function blank_page(pos)
 	page_end = pos
---	page_end.x = pos.x 
---	page_end.y = pos.y 
---	page_end.z = pos.z 
 	if page_start ~= nil and math.abs(page_start.x-page_end.x) <20 and math.abs(page_start.y-page_end.y) <20 and math.abs(page_start.z-page_end.z) <20 then 
---		minetest.chat_send_all("blank_page pos.x:" .. pos.x ..">" )
---		minetest.chat_send_all("page_end.y:" .. page_end.y ..">" )
---		minetest.chat_send_all("page_start.y:" .. page_start.y ..">" )
 		if page_end.y <= page_start.y then  --if the page end block was placed at or below page start block
 			if page_end.x == page_start.x then
 				buildwall(page_start.z, pos.z, page_start.y, pos.y, "x", pos.x, "phonics:BlankPaper")	
@@ -641,7 +610,6 @@ end
 
 function buildwall(hstart, hend, ystart, yend, haxis, haxis_fixed, nodename)	
 	repeat
-	minetest.chat_send_all("buildwall ystart:"..ystart)
 	buildrow(hstart, hend, ystart, haxis, haxis_fixed, nodename)
 	ystart = ystart -1
 	until ystart < yend
@@ -650,11 +618,9 @@ end
 function buildrow(hstart, hend, y, haxis, haxis_fixed, nodename)
 	local hpos = math.min(hstart, hend)
 	local hmax = math.max(hstart, hend)
-	minetest.chat_send_all("buildrow hmax:"..hmax)
 	local current_pos={}
 	current_pos.y = y
 	repeat
-		minetest.chat_send_all("buildrow hpos:"..hpos)
 		if haxis =="x" then
 			current_pos.z = hpos
 			current_pos.x = haxis_fixed		
