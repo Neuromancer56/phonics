@@ -190,7 +190,7 @@ minetest.register_node("phonics:SayWord", {
 	tiles = {
 	"white.jpg",
 	"white.jpg",
-	"white.jpg",
+	"SpeakingMouth64.png",
 	"SpeakingMouth64.png",
 	"SpeakingMouth64.png",
 	"SpeakingMouth64.png",},
@@ -690,7 +690,7 @@ minetest.register_chatcommand("w", {
 	privs = {shout=true},
 	func = function(name, param)
 		if page_start == nil or page_end == nil then minetest.chat_send_player(name, "You need to create a page first") return end
-		write_message(param)
+		write_message(string.lower(param))
 	end,		})
 	
 function write_message(param)
