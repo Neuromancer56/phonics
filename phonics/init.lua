@@ -284,7 +284,7 @@ minetest.register_node("phonics:BlankPaper", {
 	is_ground_content = true,
 		paramtype = "light",
 	paramtype2 = "facedir",
-	groups = {cracky=3,not_in_creative_inventory=1},
+	groups = {cracky=3},
 	sounds = default.node_sound_stone_defaults(),
 })
 
