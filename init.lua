@@ -364,7 +364,7 @@ function sound_out_word(pos1, axis, direction)
 	end			
 	local b4_nodename = minetest.env:get_node(test_pos).name 			
 	if b4_nodename ~="phonics:BlankPaper" then	
-	   	if test_nodename_prefix ~="phonics" or test_nodename_suffix == "BlankPaper" then 
+	   	if test_nodename_prefix ~="phonics" or test_nodename_suffix == "BlankPaper" or test_nodename_suffix =="PaperStart" then 
 	   		return
 	    end
 	end
