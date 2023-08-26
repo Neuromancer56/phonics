@@ -1,6 +1,6 @@
 phonics
 =======
-Phonics by gbacon24 and Neuromancer
+Phonics by Neuromancer
 The purpose of this mod is to teach people to read.   Initially it will be used to teach English, but there is no reason it could not be adapted to any language that relates symbols to sounds.   The idea is that there are 45 or so basic sounds in English, and only 26 characters to represent them,  so we will improvise and invent some new characters so that we have one per sound.   For example "oo", "sh", "ch", "ar", "au" and long vowel symbols.   By having 1 character represent 1 sound, you have simplified the language and given a beginner an easier way to start to learn how to read.   Reading words then becomes an exercise in sounding out words.
 Download
 https://github.com/Neuromancer56/phonic … master.zip
