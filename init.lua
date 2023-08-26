@@ -229,14 +229,26 @@ minetest.register_node("phonics:PaperStart", {
 	end,
 	on_punch = function(pos, node, puncher)        
 		clear_page(pos)
-	end,		
+	end--[[,		
 	on_dig = function(pos_dig,node)
 		replace_page(pos_dig, "x", 1, "air")
 	    replace_page(pos_dig, "x", -1, "air")
 	    replace_page(pos_dig, "z", 1, "air")
 	    replace_page(pos_dig, "z", -1, "air")
 	    replace_column(pos_dig, "air")
-	end
+	end,
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+        local player = digger:get_player_name()
+        local itemstack = ItemStack("phonics:PaperStart")
+        local inv = minetest.get_inventory({type = "player", name = player})
+
+        if inv and inv:room_for_item("main", itemstack) then
+            inv:add_item("main", itemstack)
+        else
+            -- If the player's inventory is full, spawn the item on the ground
+            minetest.add_item(pos, itemstack)
+        end
+	end]]
 })
 
 function clear_page(pos)
