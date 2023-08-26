@@ -697,6 +697,27 @@ function write_message(param)
 	write_message_to_page(param)		
 end	
  
+--turn the phonics nodes into ores:
+
+-- Function to generate the phonics nodes underground
+
+
+-- Register nodes based on the phonics data
+for key, value in pairs(phonics) do
+    -- Generate the nodes underground using the register_ore function
+    minetest.register_ore({
+        ore_type       = "scatter",
+        ore            = "phonics:" .. key,
+        wherein        = "default:stone",
+        clust_scarcity = 5 * 5 * 5,
+        clust_num_ores = 1,
+        clust_size     = 1,
+        y_min          = -31000,  -- Adjust these values for your desired depth range
+        y_max          = 100,
+    })
+end
+
+
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
  	--minetest.env:dig_node(pos) 
