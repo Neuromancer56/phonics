@@ -715,8 +715,51 @@ for key, value in pairs(phonics) do
         y_min          = -31000,  -- Adjust these values for your desired depth range
         y_max          = 100,
     })
-end
 
+	if  phonics[key].is_letter ==1 then	
+		minetest.register_ore({
+			ore_type       = "scatter",
+			ore            = "phonics:0" .. key,
+			wherein        = "default:stone",
+			clust_scarcity = 5 * 5 * 5,
+			clust_num_ores = 1,
+			clust_size     = 1,
+			y_min          = -31000,  -- Adjust these values for your desired depth range
+			y_max          = 100,
+		})
+	end
+end
+minetest.register_ore({
+	ore_type       = "scatter",
+	ore            = "phonics:SayWord",
+	wherein        = "default:stone",
+	clust_scarcity = 5 * 5 * 5,
+	clust_num_ores = 1,
+	clust_size     = 1,
+	y_min          = -31000,  -- Adjust these values for your desired depth range
+	y_max          = 100,
+})
+minetest.register_ore({
+	ore_type       = "scatter",
+	ore            = "phonics:PaperStart",
+	wherein        = "default:stone",
+	clust_scarcity = 5 * 5 * 5,
+	clust_num_ores = 1,
+	clust_size     = 1,
+	y_min          = -31000,  -- Adjust these values for your desired depth range
+	y_max          = 100,
+})
+
+minetest.register_ore({
+	ore_type       = "scatter",
+	ore            = "phonics:PaperFinish",
+	wherein        = "default:stone",
+	clust_scarcity = 5 * 5 * 5,
+	clust_num_ores = 1,
+	clust_size     = 1,
+	y_min          = -31000,  -- Adjust these values for your desired depth range
+	y_max          = 100,
+})
 
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
