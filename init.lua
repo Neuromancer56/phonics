@@ -540,7 +540,7 @@ function write_page_row(pos, axis, direction, message)
 				minetest.env:add_node(replace_pointer, {name=new_nodename})				
 			else
 				new_nodename = get_next_phonic_in_message(message)
-				minetest.env:add_node(replace_pointer, {name=new_nodename})			
+				minetest.env:add_node(replace_pointer, {name=new_nodename})	--*******************************************		
 			end	
 			if axis == "x" then
 				replace_pointer.x=replace_pointer.x+direction
@@ -576,12 +576,17 @@ function get_next_phonic_in_message(message)
 			char_after_current_char = string.sub(message,message_index+1,message_index+1)
 			third_char = string.sub(message,message_index+2,message_index+2)
 			two_chars = current_char_in_message..char_after_current_char
-			three_chars = two_chars..third_char		 
-			if two_char_phonics[two_chars] ~= nil then										
+			three_chars = two_chars..third_char
+			--minetest.log("x", "phonic_builder: "..phonic_builder)
+			--minetest.log("x", "phonic_builder 1st char: "..string.sub(phonic_builder,1,1))
+			--minetest.log("x", "two_chars: "..two_chars)
+			--check to see if this is a 2 character phonic.  But only if it doesn't begin with an "_" or if it is _oo.
+			--this is because the only two character phonic that can use the "_" prefix is the "_oo" phonic.
+			if (two_char_phonics[two_chars] ~= nil and string.sub(phonic_builder,1,1) ~= "_" and string.sub(phonic_builder,1,1) ~= "0") or two_chars == "oo" then										
 				phonic_builder = phonic_builder..char_after_current_char
 				message_index = message_index +1
 			end	
-			if three_char_phonics[three_chars] ~= nil then						
+			if (three_char_phonics[three_chars] ~= nil and string.sub(phonic_builder,1,1) ~= "_" and string.sub(phonic_builder,1,1) ~= "0")then						
 				phonic_builder = phonic_builder..string.sub(message,message_index+1,message_index+2)
 				message_index = message_index +2
 			end			
