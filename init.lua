@@ -85,7 +85,7 @@ phonics = {
 	_u={name="_u", length=.92, gain=1, is_letter=0},	
 	v={name="v", length=.65, gain=1, is_letter=1},
 	w={name="w", length=.45, gain=1, is_letter=1},
-	wh={name="wh", length=.23, gain=1, is_letter=0},
+	--wh={name="wh", length=.23, gain=1, is_letter=0},
 	x={name="x", length=.6, gain=1, is_letter=1},
 	y={name="y", length=.84, gain=1, is_letter=1},		
 	z={name="z", length=.65, gain=1, is_letter=1}
@@ -100,7 +100,7 @@ two_char_phonics = {
 	ou= {name="ou"},
 	sh= {name="sh"},
 	th= {name="th"},
-	wh= {name="wh"}	
+	--wh= {name="wh"}	
 }
 
 three_char_phonics = {
