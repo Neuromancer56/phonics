@@ -582,7 +582,7 @@ function get_next_phonic_in_message(message)
 			--minetest.log("x", "two_chars: "..two_chars)
 			--check to see if this is a 2 character phonic.  But only if it doesn't begin with an "_" or if it is _oo.
 			--this is because the only two character phonic that can use the "_" prefix is the "_oo" phonic.
-			if (two_char_phonics[two_chars] ~= nil and string.sub(phonic_builder,1,1) ~= "_" and string.sub(phonic_builder,1,1) ~= "0") or two_chars == "oo" then										
+			if (two_char_phonics[two_chars] ~= nil and string.sub(phonic_builder,1,1) ~= "_" and string.sub(phonic_builder,1,1) ~= "0") or (two_chars == "oo" and string.sub(phonic_builder,1,1) ~= "0") then										
 				phonic_builder = phonic_builder..char_after_current_char
 				message_index = message_index +1
 			end	
