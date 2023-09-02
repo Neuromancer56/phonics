@@ -1,0 +1,2 @@
+# Set scarcity of phonic nodes found in stone. Suggested values between 125-3500.
+phonics_scarcity (Find a given type of phonic node in this many cubic nodes.  Smaller# = more common.) int 350
