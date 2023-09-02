@@ -540,14 +540,18 @@ function write_page_row(pos, axis, direction, message)
 				minetest.env:add_node(replace_pointer, {name=new_nodename})				
 			else
 				new_nodename = get_next_phonic_in_message(message)
-				minetest.env:add_node(replace_pointer, {name=new_nodename})	--*******************************************		
+				if minetest.registered_nodes[new_nodename] then
+					minetest.env:add_node(replace_pointer, {name=new_nodename})	--*******************************************		
+				end
 			end	
-			if axis == "x" then
-				replace_pointer.x=replace_pointer.x+direction
-			end	
-			if axis == "z" then
-				replace_pointer.z=replace_pointer.z+direction
-			end				
+			if minetest.registered_nodes[new_nodename] then
+				if axis == "x" then
+					replace_pointer.x=replace_pointer.x+direction
+				end	
+				if axis == "z" then
+					replace_pointer.z=replace_pointer.z+direction
+				end				
+			end
 		end
 	until nodename_prefix ~="phonics" or message_index > string.len(message)	
 end
