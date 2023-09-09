@@ -724,25 +724,13 @@ end
 
 phonics_scarcity = tonumber(minetest.settings:get("phonics_scarcity")) or 350
 
-
--- Register nodes based on the phonics data
-for key, value in pairs(phonics) do
-    -- Generate the nodes underground using the register_ore function
-    minetest.register_ore({
-        ore_type       = "scatter",
-        ore            = "phonics:" .. key,
-        wherein        = "default:stone",
-        clust_scarcity = phonics_scarcity,
-        clust_num_ores = 1,
-        clust_size     = 1,
-        y_min          = -31000,  -- Adjust these values for your desired depth range
-        y_max          = 100,
-    })
-
-	if  phonics[key].is_letter ==1 then	
+if phonics_scarcity >0 then
+	-- Register nodes based on the phonics data
+	for key, value in pairs(phonics) do
+		-- Generate the nodes underground using the register_ore function
 		minetest.register_ore({
 			ore_type       = "scatter",
-			ore            = "phonics:0" .. key,
+			ore            = "phonics:" .. key,
 			wherein        = "default:stone",
 			clust_scarcity = phonics_scarcity,
 			clust_num_ores = 1,
@@ -750,72 +738,85 @@ for key, value in pairs(phonics) do
 			y_min          = -31000,  -- Adjust these values for your desired depth range
 			y_max          = 100,
 		})
+
+		if  phonics[key].is_letter ==1 then	
+			minetest.register_ore({
+				ore_type       = "scatter",
+				ore            = "phonics:0" .. key,
+				wherein        = "default:stone",
+				clust_scarcity = phonics_scarcity,
+				clust_num_ores = 1,
+				clust_size     = 1,
+				y_min          = -31000,  -- Adjust these values for your desired depth range
+				y_max          = 100,
+			})
+		end
 	end
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:SayWord",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:PaperStart",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
+
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:PaperFinish",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
+
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:period",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
+
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:exclamation_point",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
+
+	minetest.register_ore({
+		ore_type       = "scatter",
+		ore            = "phonics:question_mark",
+		wherein        = "default:stone",
+		clust_scarcity = phonics_scarcity,
+		clust_num_ores = 1,
+		clust_size     = 1,
+		y_min          = -31000,  -- Adjust these values for your desired depth range
+		y_max          = 100,
+	})
 end
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:SayWord",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:PaperStart",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
-
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:PaperFinish",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
-
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:period",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
-
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:exclamation_point",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
-
-minetest.register_ore({
-	ore_type       = "scatter",
-	ore            = "phonics:question_mark",
-	wherein        = "default:stone",
-	clust_scarcity = phonics_scarcity,
-	clust_num_ores = 1,
-	clust_size     = 1,
-	y_min          = -31000,  -- Adjust these values for your desired depth range
-	y_max          = 100,
-})
 
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
