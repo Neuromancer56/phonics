@@ -818,6 +818,9 @@ if phonics_scarcity >0 then
 	})
 end
 
+
+local dpath = minetest.get_modpath("phonics") .. "/"
+dofile(dpath .. "crafting.lua")
 print("Phonics Mod Loaded!")
  	--minetest.env:punch_node(pos) 
  	--minetest.env:dig_node(pos) 
