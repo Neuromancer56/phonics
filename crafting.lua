@@ -55,6 +55,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "default:chest 3",
+	recipe = {
+		{"phonics:ch", "phonics:e", "phonics:s"},
+		{"phonics:t", "",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
 	output = "default:coal_lump 10",
 	recipe = {
 		{"phonics:c", "phonics:_o", "phonics:0a"},
@@ -86,6 +95,15 @@ minetest.register_craft({
 	recipe = {
 		{"phonics:b", "phonics:l", "phonics:a"},
 		{"phonics:c", "phonics:0k",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:blue 10",
+	recipe = {
+		{"phonics:b", "phonics:l", "phonics:_oo"},
+		{"", "",""},
 		{"","" ,""},
 	}
 })
@@ -136,10 +154,37 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "dye:blue 10",
+	output = "dye:grey 10",
 	recipe = {
-		{"phonics:b", "phonics:l", "phonics:_oo"},
-		{"", "",""},
+		{"phonics:g", "phonics:r", "phonics:_a"},
+		{"phonics:0y", "",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:magenta 10",
+	recipe = {
+		{"phonics:m", "phonics:u", "phonics:j"},
+		{"phonics:e", "phonics:n","phonics:t"},
+		{"phonics:u","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:orange 10",
+	recipe = {
+		{"phonics:_o", "phonics:r", "phonics:a"},
+		{"phonics:n", "phonics:j","phonics:0e"},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:pink 10",
+	recipe = {
+		{"phonics:p", "phonics:i", "phonics:n"},
+		{"phonics:k", "",""},
 		{"","" ,""},
 	}
 })
@@ -149,6 +194,33 @@ minetest.register_craft({
 	recipe = {
 		{"phonics:r", "phonics:e", "phonics:d"},
 		{"", "",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:violet 10",
+	recipe = {
+		{"phonics:v", "phonics:_i", "phonics:_o"},
+		{"phonics:l", "phonics:e","phonics:t"},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:white 10",
+	recipe = {
+		{"phonics:w", "phonics:0h", "phonics:_i"},
+		{"phonics:t", "phonics:0e",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "dye:yellow 10",
+	recipe = {
+		{"phonics:y", "phonics:e", "phonics:l"},
+		{"phonics:0l", "phonics_o","phonics:0w"},
 		{"","" ,""},
 	}
 })
