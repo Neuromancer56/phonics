@@ -82,11 +82,29 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "default:door 5",
+	output = "doors:door_wood 15",
 	recipe = {
 		{"phonics:d", "phonics:_o", "phonics:0o"},
 		{"phonics:r", "",""},
 		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "doors:door_steel 15",
+	recipe = {
+		{"phonics:s", "phonics:t", "phonics:_e"},
+		{"phonics:0e", "phonics:l", "phonics:d"},
+		{"phonics:_o", "phonics:0o","phonics:r"},
+	}
+})
+
+minetest.register_craft({
+	output = "doors:door_glass 15",
+	recipe = {
+		{"phonics:g", "phonics:l", "phonics:a"},
+		{"phonics:s", "phonics:0s", "phonics:d"},
+		{"phonics:_o", "phonics:0o","phonics:r"},
 	}
 })
 
@@ -220,13 +238,14 @@ minetest.register_craft({
 	output = "dye:yellow 10",
 	recipe = {
 		{"phonics:y", "phonics:e", "phonics:l"},
-		{"phonics:0l", "phonics_o","phonics:0w"},
+		{"phonics:0l", "phonics:_o","phonics:0w"},
 		{"","" ,""},
 	}
 })
 
+--not working
 minetest.register_craft({
-	output = "default:fence 33",
+	output = "default:fence_wood 33",
 	recipe = {
 		{"phonics:f", "phonics:e", "phonics:n"},
 		{"phonics:s", "phonics:0e",""},
