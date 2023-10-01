@@ -17,13 +17,21 @@ minetest.register_craft({
 	}
 })
 
---doesn't work 
 minetest.register_craft({
-	output = "beds:fancy_bed",
+	output = "beds:bed_bottom 4",
 	recipe = {
 		{"phonics:b", "phonics:e", "phonics:d"},
 		{"", "",""},
 		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "beds:fancy_bed_bottom 4",
+	recipe = {
+		{"phonics:f","phonics:a" ,"phonics:n"},
+		{"phonics:s", "phonics:_e",""},
+		{"phonics:b", "phonics:e", "phonics:d"},
 	}
 })
 
@@ -243,7 +251,7 @@ minetest.register_craft({
 	}
 })
 
---not working
+--There are more fence types to make
 minetest.register_craft({
 	output = "default:fence_wood 33",
 	recipe = {
@@ -280,7 +288,6 @@ minetest.register_craft({
 	}
 })
 
---minetest.clear_craft({output = "default:pick_steel"}) 
 minetest.register_craft({
 	output = "default:pick_steel",
 	recipe = {
@@ -305,6 +312,15 @@ minetest.register_craft({
 	recipe = {
 		{"phonics:r", "phonics:_a", "phonics:0i"},
 		{"phonics:l", "",""},
+		{"","" ,""},
+	}
+})
+
+minetest.register_craft({
+	output = "default:shovel_steel",
+	recipe = {
+		{"phonics:sh", "phonics:u", "phonics:v"},
+		{"phonics:0e", "phonics:l",""},
 		{"","" ,""},
 	}
 })
@@ -354,8 +370,14 @@ minetest.register_craft({
 	}
 })
 
-
-
+minetest.register_craft({
+	output = "wool:white 30",
+	recipe = {
+		{"phonics:w", "phonics:oo", "phonics:l"},
+		{"", "",""},
+		{"","" ,""},
+	}
+})
 
 
 
