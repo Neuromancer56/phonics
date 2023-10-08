@@ -21,9 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 Additional Texture Licences:
-large_open_book.png
-http://www.clipartpal.com/clipart_pd/education/openbook_10941.html
-This Public Domain image is available for personal and commercial projects.
 
 nicubunu_Scroll.png
 Shared by: OCAL
