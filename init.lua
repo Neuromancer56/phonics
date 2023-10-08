@@ -1,46 +1,4 @@
 
---Phonics by bacon and Neuromancer
---License code and textures WTFPL 
- 
---For now you can left click the blue blocks and they make phonics sounds and light up.  
-
---Start by placing the blue phonics blocks and left clicking on them to hear their sounds.  They also light up.
---Next place a "sound out word" block (the one with a mouth on it) and then build a word by placing the blue blocks next to it.
---Left Click (punch) the mouth block to hear the word you built sounded out.
-
---This mod has a long way to go: 
---Plan for enhancements (being worked on):
---***TEST: punching a page start will not only blank the page, but reset the current_page_start so it can be written to again.
---***put a limit on how far away page finish can be from page start on x and z axis.
-
---Add a chat command allowing a teaching player to type in words that appear as phonics.  That way the learning player must either 
---read what the teacher types in chat, or sound out the phonics blocks that appear above the teacher's head.  Then it is just free play
---in whatever peak's the learner's interest.
---Chat command /ph will display a Sentence Block, plus what they typed with a sayWord block in front of every word.
---if the sentence block is deleted, the whole sentence is deleted.
---to display "ar" type a+r, to display long e, type "e_", to display silent e, type Se
-
-
-
---Left Clicking (punching) on the mouth block left click says a word it wants you to spell 
---followed by sounding out what you have spelled to the right of it.
---if what you have spelled matches one of the spellings for the mouth the block is looking for it makes a
----firework sound (eventually launching blocks into the air as fireworks)
---if you have not spelled the word the mouth block is looking for, it makes a sad noise.
---if you destroy mouth block, it destroys all letters to the right of it  (explode or fire burn)
---gray blocks are silent letters which are not sounded out 
--- this means we have to create sounds for words and an array of spellings for each word.
---if you don't want a word and want a new word, just destroy the mouth block.
---maybe have it spell out the correct answer if you put a show answer block on top of the mouth block.
---if you place a word block, a word is automatically generated to the right of the word block and you are expected to read it.
---you can click individual blocks to help you sound it out
---you can also left click the word block to get the answer (it will sound out the word and then say the word.)
---Create blocks with pictures of the thing that the word describes so that someone learning the language as a second language could also benefit.
---someday have an NPC Tutor.
-
---TODO:
---punch scroll blanks the page again.
---dig scroll deletes the page.
 
 local page_start
 local page_end
